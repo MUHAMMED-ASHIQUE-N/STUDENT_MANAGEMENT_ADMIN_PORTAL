@@ -1,3 +1,5 @@
+import type { Unsubscribe } from "firebase/auth";
+
 export interface UserData {
     uid: string;
     email: string;
@@ -13,30 +15,39 @@ export interface AuthContextType {
     logout: () => Promise<void>;
 }
 
-export interface Student {
-    id: string;
-    name: string;
-    email: string;
-    course: string;
-    createdAt: Date;
-    role: "admin" | "student";
-}
+// export interface Student {
+//     id: string;
+//     name: string;
+//     email: string;
+//     course: string;
+//     createdAt: Date;
+//     role: "admin" | "student";
+// }
 
-export type StudentDtl = {
+export type StudentDetails = {
   id: string;
   name: string;
   email: string;
   course: string;
+  paidAmount:number;
 };
 
 
 export interface StudentContextType {
-    createStudent: (name: string, email: string, password: string, course: string) => Promise<void>;
-    fetchStudents:() => Promise<void>
-    // editStudent: (id: string, updates: Partial<Student>) => Promise<void>;
-    updatedStudent: (id: string, name: string, email: string, course: string) => Promise<void>
+    createStudent: (name: string, email: string, password: string, course: string, paidAmount:number) => Promise<void>;
+    subscribeStudents:() => Unsubscribe;
+    updatedStudent: (id: string, name: string, email: string, course: string, paidAmount:number) => Promise<void>;
     deleteStudent: (id: string) => Promise<void>;
-    stdDetails:StudentDtl[] | null;
+    stdDetails:StudentDetails[] | null;
     loading: boolean;
     error: string | null;
+}
+
+
+
+export interface Coursetype {
+    id:string;
+    courseName: string;
+    duration: string;
+    fees: string
 }

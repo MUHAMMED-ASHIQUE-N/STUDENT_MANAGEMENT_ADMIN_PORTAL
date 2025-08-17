@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react'
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase/config';
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
-import { type Student, type StudentContextType, type StudentDtl } from '../type/auth';
+import { collection, deleteDoc, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { type StudentContextType, type StudentDetails } from '../type/auth';
 
 
 
@@ -12,9 +12,9 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [ stdDetails, setStdDetails] = useState<StudentDtl[] | null>(null);
+  const [stdDetails, setStdDetails] = useState<StudentDetails[] | null>(null);
 
-  const createStudent = async (name: string, email: string, password: string, course: string) => {
+  const createStudent = async (name: string, email: string, password: string, course: string, paidAmount:number) => {
 
     setLoading(true);
     setError(null);
@@ -26,6 +26,7 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
         name,
         email,
         course,
+        paidAmount,
         createdAt: new Date(),
         role: "student",
       });
@@ -39,67 +40,41 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   }
 
-  
 
-//   type StudentDtl = {
-//   id: string;
-//   name: string;
-//   email: string;
-//   course: string;
-// };
+  const subscribeStudents = () => {
+    const studentsCollection = collection(db, "userDetails");
+    const unsubscribe = onSnapshot(studentsCollection, (snapshot) => {
+      const students: StudentDetails[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as Omit<StudentDetails, "id">)
+      }));
 
- const getAllStudents = async (): Promise<StudentDtl[]> => {
-  const studentsCollection = collection(db, "userDetails");
-  const snapshot = await getDocs(studentsCollection);
+      setStdDetails(students)
+    });
 
-  const students: StudentDtl[] = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...(doc.data() as Omit<StudentDtl, "id">)
-  }));
-
-  return students;
-};
-
-
- const fetchStudents = async () => {
-  const data = await getAllStudents();
-  setStdDetails(data)
-  console.log("Students:", data);
-};
-
-
-
-
-// const editStudent = async ( id:string, update: Partial<Student> ) => {
-//   try {
-//     await updateDoc(doc(db, "userDetails", id), update)
-//   }
-//   catch(err:any) {
-//     setError(err.message);
-//   } 
-// }
-
-
-const updatedStudent = async (id:string, name:string, email:string, course:string) => {
-  setLoading(true);
-  try {
-
-    const studentRef = doc(db, "userDetails", id);
-    await updateDoc(studentRef, {name, email, course});
-
+    return unsubscribe;
   }
-  catch(err:any) {
-    setError(err.message);
+
+
+
+  const updatedStudent = async (id: string, name: string, email: string, course: string, paidAmount:number) => {
+    setLoading(true);
+    try {
+      const studentRef = doc(db, "userDetails", id);
+      await updateDoc(studentRef, { name, email, course, paidAmount });
+    }
+    catch (err: any) {
+      setError(err.message);
+    }
+    finally {
+      setLoading(false);
+    }
   }
-  finally{
-    setLoading(false);
-  }
-}
+
 
 
   const deleteStudent = async (id: string) => {
     try {
-
       await deleteDoc(doc(db, "userDetails", id))
     }
     catch (err: any) {
@@ -111,7 +86,7 @@ const updatedStudent = async (id:string, name:string, email:string, course:strin
 
 
   return (
-    <StudentContext.Provider value={{ createStudent, fetchStudents, updatedStudent, deleteStudent, stdDetails, loading, error }}>
+    <StudentContext.Provider value={{ createStudent, subscribeStudents, updatedStudent, deleteStudent, stdDetails, loading, error }}>
       {children}
     </StudentContext.Provider>
 

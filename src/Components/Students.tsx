@@ -1,31 +1,34 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useStudent } from '../context/StudentContext';
 import StudentList from './StudentList';
 
 function Students() {
 
-  // const { createStudent } = useContext(StudentContext)!;
-  const { createStudent, loading, error, updatedStudent, stdDetails } = useStudent();
+  const { createStudent, loading, error, updatedStudent } = useStudent();
 
   const [editId, setEditId] = useState<string | null>(null)
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [paidAmount, setPaidAmount] = useState(0);
   const [course, setCourse] = useState("");
+  // const [courseId, setCourseId] = useState("");
+
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (editId) {
-      updatedStudent(editId, name, email, course);
+      updatedStudent(editId, name, email, course, paidAmount);
       console.log('student edit success');
       setEditId(null)
 
     }
     else {
-      await createStudent(name, email, password, course);
-      console.log('student create successfullyyy', name, email, course);
+      await createStudent(name, email, password, course, paidAmount);
+      console.log('student create successfullyyy', name, paidAmount);
     }
 
 
@@ -33,21 +36,29 @@ function Students() {
     setEmail("")
     setPassword("")
     setCourse("")
+    setPaidAmount(0)
 
   }
 
+  const formRef = useRef<HTMLDivElement>(null);
+  
   const handleEdit = (student: any) => {
     setEditId(student.id);
     setName(student.name);
     setEmail(student.email);
     setCourse(student.course);
+    setPaidAmount(student.paidAmount);
     setPassword("");
+
+    formRef.current?.scrollIntoView({ behavior:"smooth" });
 
   }
 
   return (
     <div className='p-8'>
-      <div className='w-1/2 bg-white border-t-6 rounded-2xl border-blue-500 p-6 '>
+      <div 
+      ref={formRef}
+      className='w-1/2 bg-white border-t-6 rounded-2xl border-blue-500 p-6 '>
         <h1 className='text-center text-2xl'>
           {editId ? "Edit Student" : "Create New Student"}
 
@@ -69,6 +80,7 @@ function Students() {
               placeholder='email'
               required
               className='border border-gray-400 rounded-md py-2 px-3' />
+           
             {!editId && (
               <>
                 <label htmlFor="password">Student Password</label>
@@ -88,6 +100,29 @@ function Students() {
               value={course}
               onChange={(e) => setCourse(e.target.value)}
               placeholder='course'
+              required
+              className='border border-gray-400 rounded-md py-2 px-3 ' />
+
+                 {/* <select
+          value={courseId}
+          onChange={(e) => setCourseId(e.target.value)}
+          className="border p-2 w-full rounded"
+          required
+        >
+          <option value="">Select Course</option>
+          {course.map(course => (
+            <option key={course.id} value={course.id}>
+              {course.courseName} (₹{course.fees})
+            </option>
+          ))}
+        </select> */}
+
+
+            <label htmlFor="">Amount Paid</label>
+            <input type="text"
+              value={paidAmount}
+              onChange={(e) => setPaidAmount(Number(e.target.value)) }
+              placeholder='Amound paid'
               required
               className='border border-gray-400 rounded-md py-2 px-3 ' />
           </div>

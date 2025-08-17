@@ -2,11 +2,12 @@ import React, { useEffect } from 'react'
 import { useStudent } from '../context/StudentContext'
 
 function StudentList( {onEdit} : {onEdit: (student:any) => void}) {
-    const { fetchStudents, deleteStudent, stdDetails} = useStudent()
+    const { subscribeStudents, deleteStudent, stdDetails} = useStudent()
 
       useEffect(()=>{
-        fetchStudents();
-      },[])
+        const unsubscribe = subscribeStudents();
+        return () => unsubscribe();
+      },[]);
     
     
   return (
@@ -19,7 +20,8 @@ function StudentList( {onEdit} : {onEdit: (student:any) => void}) {
             <div>
             <p>{student.name} </p>
             <p>{student.course} </p>
-            <p>{student.email} EMAIL</p>
+            <p>{student.email} </p>
+            <p>{student.paidAmount}fees </p>
             </div>
             <button 
             onClick={() => onEdit(student)}
