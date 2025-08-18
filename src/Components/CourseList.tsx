@@ -14,6 +14,7 @@ function CourseList({onEdit, onDelete ,course} : {onEdit: (data:any) => void , o
             <p>{data.courseName} </p>
             <p>{data.duration} </p>
             <p>{data.fees} </p>
+            <p>Admission Fee: {data.admissionfee} </p>
             </div>
             <button 
             onClick={() => onEdit(data)}

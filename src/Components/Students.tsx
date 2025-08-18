@@ -1,6 +1,9 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useStudent } from '../context/StudentContext';
 import StudentList from './StudentList';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import type { Coursetype } from '../type/auth';
 
 function Students() {
 
@@ -11,23 +14,33 @@ function Students() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [paidAmount, setPaidAmount] = useState(0);
-  const [course, setCourse] = useState("");
-  // const [courseId, setCourseId] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [courses, setCourses] = useState<Coursetype[]>([]);
+  
 
 
+  useEffect(() => {
 
+    const fetchCourses = async () => {
+      const snapshot = await getDocs(collection(db, "courses"));
+      setCourses(snapshot.docs.map(doc => ({
+        id: doc.id, ...(doc.data() as Omit<Coursetype, "id">)
+      })));
+    }
+    fetchCourses();
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (editId) {
-      updatedStudent(editId, name, email, course, paidAmount);
+      updatedStudent(editId, name, email, courseId, paidAmount);
       console.log('student edit success');
       setEditId(null)
 
     }
     else {
-      await createStudent(name, email, password, course, paidAmount);
+      await createStudent(name, email, password, courseId, paidAmount);
       console.log('student create successfullyyy', name, paidAmount);
     }
 
@@ -35,30 +48,30 @@ function Students() {
     setName("")
     setEmail("")
     setPassword("")
-    setCourse("")
+    setCourseId("")
     setPaidAmount(0)
 
   }
 
   const formRef = useRef<HTMLDivElement>(null);
-  
+
   const handleEdit = (student: any) => {
     setEditId(student.id);
     setName(student.name);
     setEmail(student.email);
-    setCourse(student.course);
+    setCourseId(student.course);
     setPaidAmount(student.paidAmount);
     setPassword("");
 
-    formRef.current?.scrollIntoView({ behavior:"smooth" });
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
 
   }
 
   return (
     <div className='p-8'>
-      <div 
-      ref={formRef}
-      className='w-1/2 bg-white border-t-6 rounded-2xl border-blue-500 p-6 '>
+      <div
+        ref={formRef}
+        className='w-1/2 bg-white border-t-6 rounded-2xl border-blue-500 p-6 '>
         <h1 className='text-center text-2xl'>
           {editId ? "Edit Student" : "Create New Student"}
 
@@ -80,7 +93,7 @@ function Students() {
               placeholder='email'
               required
               className='border border-gray-400 rounded-md py-2 px-3' />
-           
+
             {!editId && (
               <>
                 <label htmlFor="password">Student Password</label>
@@ -95,33 +108,27 @@ function Students() {
 
             )}
 
-            <label htmlFor="course">Student course</label>
-            <input type="text"
-              value={course}
-              onChange={(e) => setCourse(e.target.value)}
-              placeholder='course'
-              required
-              className='border border-gray-400 rounded-md py-2 px-3 ' />
 
-                 {/* <select
-          value={courseId}
-          onChange={(e) => setCourseId(e.target.value)}
-          className="border p-2 w-full rounded"
-          required
-        >
-          <option value="">Select Course</option>
-          {course.map(course => (
-            <option key={course.id} value={course.id}>
-              {course.courseName} (₹{course.fees})
-            </option>
-          ))}
-        </select> */}
+    <label htmlFor="course">select course</label>
+            <select
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+              className="border p-2 w-full rounded"
+              required
+            >
+              <option value="">Select Course</option>
+              {courses.map(course => (
+                <option key={course.id} value={course.id}>
+                  {course.courseName} 
+                </option>
+              ))}
+            </select>
 
 
             <label htmlFor="">Amount Paid</label>
             <input type="text"
               value={paidAmount}
-              onChange={(e) => setPaidAmount(Number(e.target.value)) }
+              onChange={(e) => setPaidAmount(Number(e.target.value))}
               placeholder='Amound paid'
               required
               className='border border-gray-400 rounded-md py-2 px-3 ' />
@@ -134,7 +141,7 @@ function Students() {
         </form>
       </div>
 
-      <StudentList onEdit={handleEdit} />
+      <StudentList onEdit={handleEdit} courses={courses} />
 
 
     </div>

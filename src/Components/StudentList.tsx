@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { useStudent } from '../context/StudentContext'
+import type { Coursetype } from '../type/auth';
 
-function StudentList( {onEdit} : {onEdit: (student:any) => void}) {
+function StudentList( {onEdit, courses} : {onEdit: (student:any) => void; courses:Coursetype[];}) {
     const { subscribeStudents, deleteStudent, stdDetails} = useStudent()
 
       useEffect(()=>{
@@ -9,6 +10,11 @@ function StudentList( {onEdit} : {onEdit: (student:any) => void}) {
         return () => unsubscribe();
       },[]);
     
+      const getCourseName = (courseId:string) => {
+        const course = courses.find((c) => c.id === courseId );
+        return course? course.courseName : 'unknow course';
+
+      };
     
   return (
       <div>
@@ -19,7 +25,7 @@ function StudentList( {onEdit} : {onEdit: (student:any) => void}) {
            className='bg-white my-4 p-6 flex justify-between items-center'>
             <div>
             <p>{student.name} </p>
-            <p>{student.course} </p>
+            <p>{getCourseName(student.courseId)} </p>
             <p>{student.email} </p>
             <p>{student.paidAmount}fees </p>
             </div>

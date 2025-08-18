@@ -8,6 +8,7 @@ import Courses from '../Components/Courses'
 import Certificates from '../Components/Certificates'
 import Payment from '../Components/Payment'
 import ProtectedRoute from '../Components/ProtectedRoute'
+import PaymentDetails from '../Components/PaymentDetails'
 
 function Router() {
     return (
@@ -19,7 +20,9 @@ function Router() {
                 <Route path='students' element={<Students />} />
                 <Route path='courses' element={<Courses />} />
                 <Route path='certificate' element={<Certificates />} />
-                <Route path='payment' element={<Payment />} />
+                <Route path='payment' element={<Payment />} >
+                <Route path='all-details/:id' element={<PaymentDetails/>} />
+                </Route>
             </Route>
         </Routes>
     )

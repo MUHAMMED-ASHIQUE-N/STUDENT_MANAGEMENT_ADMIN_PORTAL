@@ -25,20 +25,22 @@ export interface AuthContextType {
 // }
 
 export type StudentDetails = {
-  id: string;
-  name: string;
-  email: string;
-  course: string;
-  paidAmount:number;
+    id: string;
+    name: string;
+    email: string;
+    courseId: string;
+    paidAmount: number;
+    createdAt?: Date ;
+
 };
 
 
 export interface StudentContextType {
-    createStudent: (name: string, email: string, password: string, course: string, paidAmount:number) => Promise<void>;
-    subscribeStudents:() => Unsubscribe;
-    updatedStudent: (id: string, name: string, email: string, course: string, paidAmount:number) => Promise<void>;
+    createStudent: (name: string, email: string, password: string, courseId: string, paidAmount: number) => Promise<void>;
+    subscribeStudents: () => Unsubscribe;
+    updatedStudent: (id: string, name: string, email: string, courseId: string, paidAmount: number) => Promise<void>;
     deleteStudent: (id: string) => Promise<void>;
-    stdDetails:StudentDetails[] | null;
+    stdDetails: StudentDetails[] | null;
     loading: boolean;
     error: string | null;
 }
@@ -46,8 +48,9 @@ export interface StudentContextType {
 
 
 export interface Coursetype {
-    id:string;
+    id: string;
     courseName: string;
-    duration: string;
-    fees: string
+    duration: number;
+    fees: string;
+    admissionfee:string;
 }

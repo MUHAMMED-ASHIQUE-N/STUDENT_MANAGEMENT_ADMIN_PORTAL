@@ -1,73 +1,83 @@
-import React from "react";
+
+
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase/config";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 
 type Payment = {
-  id: number;
-  date: string;
-  amountPaid: number;
-  totalAmount: number;
-  receiptUrl?: string;
+  amount: number;
+  date: string; // Firestore timestamp stored as string
+  type: "initial" | "payment";
 };
 
-const paymentHistory: Payment[] = [
-  {
-    id: 1,
-    date: "2025-01-15",
-    amountPaid: 6500,
-    totalAmount: 10000,
-    receiptUrl: "/receipts/receipt1.pdf",
-  },
-  {
-    id: 2,
-    date: "2025-03-10",
-    amountPaid: 3500,
-    totalAmount: 10000,
-    receiptUrl: "/receipts/receipt2.pdf",
-  },
-];
+const PaymentHistory: React.FC<{ userId: string }> = ({ userId }) => {
+  const [history, setHistory] = useState<Payment[]>([]);
 
-const PaymentHistory: React.FC = () => {
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const timeline: Payment[] = [];
+
+        // 1️⃣ Get student doc (initial payment)
+        const studentRef = doc(db, "userDetails", userId);
+        const studentSnap = await getDoc(studentRef);
+
+        if (studentSnap.exists()) {
+          const studentData = studentSnap.data();
+
+          if (studentData.paidAmount) {
+            timeline.push({
+              amount: studentData.paidAmount,
+              date: studentData.createdAt || new Date().toISOString(),
+              type: "initial",
+            });
+          }
+        }
+
+        // 2️⃣ Get payments subcollection
+        const paymentsRef = collection(db, "userDetails", userId, "payments");
+        const paymentSnap = await getDocs(paymentsRef);
+
+        paymentSnap.docs.forEach((doc) => {
+          const data = doc.data();
+          timeline.push({
+            amount: data.amount,
+            date: data.date || new Date().toISOString(),
+            type: "payment",
+          });
+        });
+
+        // 3️⃣ Sort by date (latest first)
+        timeline.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        setHistory(timeline);
+      } catch (error) {
+        console.error("Error fetching payment history:", error);
+      }
+    };
+
+    fetchPayments();
+  }, [userId]);
+
   return (
-    <div className="p-6 bg-white shadow rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Payment History</h2>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">Date</th>
-            <th className="border border-gray-300 px-4 py-2">Paid</th>
-            <th className="border border-gray-300 px-4 py-2">Due</th>
-            <th className="border border-gray-300 px-4 py-2">Status</th>
-            <th className="border border-gray-300 px-4 py-2">Receipt</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paymentHistory.map((payment) => {
-            const due = payment.totalAmount - payment.amountPaid;
-            const status = due === 0 ? "Paid" : "Partially Paid";
-
-            return (
-              <tr key={payment.id}>
-                <td className="border border-gray-300 px-4 py-2">{payment.date}</td>
-                <td className="border border-gray-300 px-4 py-2">₹{payment.amountPaid}</td>
-                <td className="border border-gray-300 px-4 py-2">₹{due}</td>
-                <td
-                  className={`border border-gray-300 px-4 py-2 font-semibold ${
-                    status === "Paid" ? "text-green-600" : "text-yellow-600"
-                  }`}
-                >
-                  {status}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
-                  <a href={payment.receiptUrl} target="_blank" rel="noopener noreferrer">
-                    View
-                  </a>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div>
+      <h2>Payment History</h2>
+      <ul>
+        {history.map((p, i) => (
+          <li key={i}>
+            <strong>
+              {p.type === "initial" ? "Initial Payment" : "Payment"}
+            </strong>
+            : ₹{p.amount} — {new Date(p.date).toLocaleDateString()}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
 export default PaymentHistory;
+
+

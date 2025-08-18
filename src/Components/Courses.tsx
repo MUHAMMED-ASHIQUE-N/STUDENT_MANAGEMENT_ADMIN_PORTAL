@@ -8,16 +8,19 @@ function Courses() {
   const [ course, setCourse] = useState<Coursetype[] | undefined> (undefined);
   const [ editId, setEditId] = useState<string | null>(null)
   const [ courseName, setCourseName] = useState("");
-  const [ duration, setDuration] = useState("");
+  const [ duration, setDuration] = useState(0);
   const [ fees, setFees] = useState("");
+  const [ admissionfee, setAdmissionFee] = useState("");
   const [ error, setError] = useState(null);
   const [ loading, setLoading ] = useState(false);
+
+  
 
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
 
     if(editId){
-      updateCourse(editId, courseName, duration, fees );
+      updateCourse(editId, courseName, duration, fees, admissionfee );
       setEditId(null);
     }
     else{
@@ -25,12 +28,14 @@ function Courses() {
         courseName,
         duration,
         fees,
+        admissionfee,
       });
       console.log('course created');
     }
     setCourseName("");
-    setDuration("");
+    setDuration(0);
     setFees("");
+    setAdmissionFee("");
   }
 
 
@@ -48,11 +53,11 @@ function Courses() {
     return unsubscribe;
   }
 
-  const updateCourse = async (id:string, courseName:string, duration:string, fees:string) => {
+  const updateCourse = async (id:string, courseName:string, duration:number, fees:string, admissionfee:string) => {
     setLoading(true)
     try  {
       const courseRef = doc(db, "courses", id);
-      await updateDoc(courseRef, { courseName, duration, fees });
+      await updateDoc(courseRef, { courseName, duration, fees, admissionfee });
 
     }
     catch(err:any) {
@@ -86,7 +91,8 @@ function Courses() {
   setEditId(data.id)
   setCourseName(data.courseName);
   setDuration(data.duration);
-  setFees(data.fees)
+  setFees(data.fees);
+  setAdmissionFee(data.admissionfee);
   formRef.current?.scrollIntoView({ behavior: 'smooth' })
  }
 
@@ -114,7 +120,7 @@ const deleteCourse = async (id:string) => {
             <input
               type="text"
               value={duration}
-              onChange={(e) => setDuration(e.target.value)}
+              onChange={(e) => setDuration(Number(e.target.value))}
               placeholder='course duration in month'
               required
               className='border border-gray-400 rounded-md py-2 px-3' />
@@ -127,6 +133,14 @@ const deleteCourse = async (id:string) => {
                   placeholder='course Fees'
                   required
                   className='border border-gray-400 rounded-md py-2 px-3' />
+                <label htmlFor="">Admission Fee </label>
+                <input
+                  type="text"
+                  value={admissionfee}
+                  onChange={(e) => setAdmissionFee(e.target.value)}
+                  placeholder='Admission Fees'
+                  required
+                  className='border border-gray-400 rounded-md py-2 px-3' />
           </div>
 
           <button type="submit" className='bg-blue-500 px-18 py-2 rounded-xl text-white '>
@@ -134,27 +148,6 @@ const deleteCourse = async (id:string) => {
           </button>
           {error && <p className="text-red-500">{error}</p>}
         </form>
-   {/* <div>
-        <h1>course Details</h1>
-        {course?.map((data) => (
-          <div
-          key={data.id}
-           className='bg-white my-4 p-6 flex justify-between items-center'>
-            <div>
-            <p>{data.courseName} </p>
-            <p>{data.duration} </p>
-            <p>{data.fees} </p>
-            </div>
-            <button 
-            onClick={() => handleEdit(data)}
-            className='bg-red-500/80 px-4 py-2 rounded-md text-white'>edit</button>
-            <button 
-            onClick={() => deleteCourse(data.id)}
-            className='bg-red-500/80 px-4 py-2 rounded-md text-white'>delete</button>
-          </div>
-        ))}
-
-      </div> */}
         <CourseList onEdit={handleEdit} onDelete={deleteCourse} course={course} />
 
     </div>

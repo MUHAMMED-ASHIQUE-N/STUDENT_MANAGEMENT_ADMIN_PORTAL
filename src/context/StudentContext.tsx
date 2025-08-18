@@ -14,7 +14,7 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [error, setError] = useState<string | null>(null);
   const [stdDetails, setStdDetails] = useState<StudentDetails[] | null>(null);
 
-  const createStudent = async (name: string, email: string, password: string, course: string, paidAmount:number) => {
+  const createStudent = async (name: string, email: string, password: string, courseId: string, paidAmount:number, ) => {
 
     setLoading(true);
     setError(null);
@@ -25,7 +25,7 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
       await setDoc(doc(db, "userDetails", uid), {
         name,
         email,
-        course,
+        courseId,
         paidAmount,
         createdAt: new Date(),
         role: "student",
@@ -57,11 +57,11 @@ export const StudentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
 
 
-  const updatedStudent = async (id: string, name: string, email: string, course: string, paidAmount:number) => {
+  const updatedStudent = async (id: string, name: string, email: string, courseId: string, paidAmount:number) => {
     setLoading(true);
     try {
       const studentRef = doc(db, "userDetails", id);
-      await updateDoc(studentRef, { name, email, course, paidAmount });
+      await updateDoc(studentRef, { name, email, courseId, paidAmount });
     }
     catch (err: any) {
       setError(err.message);
