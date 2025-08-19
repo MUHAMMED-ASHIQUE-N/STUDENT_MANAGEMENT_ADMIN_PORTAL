@@ -7,9 +7,13 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 const Payment = () => {
 
+
   const [students, setStudents] = useState<StudentDetails[]>([]);
   const [courses, setCourse] = useState<Coursetype[]>([]);
+  const [payments, setPayments] = useState<any[]>([])
+
   const location = useLocation();
+
 
 
   useEffect(() => {
@@ -27,12 +31,42 @@ const Payment = () => {
       setCourse(courseData)
     })
 
+    students.map((student) => {
+      const unsubPayments = onSnapshot(collection(db, `userDetails/${student.id}/payment`), (snapshot) => {
+        setPayments((prev) => ({
+          ...prev,
+          [student.id]: snapshot.docs.map(doc => ({
+            id: doc.id, ...(doc.data())
+          }))
+        }))
+        unsubPayments()
+
+        // const pay = snapshot.docs.map(doc => ({
+        //   id: doc.id, ...(doc.data())
+        // }))
+
+        // setPayments(pay)
+        // setPayments((prev) => ({
+        //       ...prev,
+        //       [student.id]: snapshot.docs.map((d) => ({
+        //         id: d.id,
+        //         ...(d.data()),
+        //       })),
+        //     }));
+
+      })
+    })
+
+
+
+
+
+
     return () => {
-      unsubStudents();
-      unsubCourses();
+      unsubStudents()
+      unsubCourses()
+
     }
-
-
   }, [])
 
 
@@ -61,7 +95,21 @@ const Payment = () => {
 
               {students.map((student) => {
                 const course = courses.find((c) => c.id === student.courseId);
-                const totalAmount =( parseInt(course?.fees)) +( parseInt( course?.admissionfee)) ;
+                const totalAmount = Number(course?.fees || 0) + Number(course?.admissionfee || 0);
+                const coursePaidAmount = payments.reduce((sum, p) => sum + p.amount, 0)
+                console.log(coursePaidAmount, 'coure total paid amount');
+                // console.log(payments.map((p) => ),'payment object');
+                console.log(
+                  payments.map((p) => (
+                  <p>{p.amount} </p>
+                ))
+                );
+                
+                
+                
+                const paidAmounttotal = coursePaidAmount + student.paidAmount
+                console.log(paidAmounttotal, "total paid amount");
+
                 const paidAmount = student.paidAmount || 0;
                 const due = (totalAmount - paidAmount);
                 const status = due === 0 ? "Paid" : "Partially Paid";
@@ -70,7 +118,7 @@ const Payment = () => {
                     <td className="border border-gray-300 px-4 py-2">{student.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{course?.courseName || 'unknow course'}</td>
                     <td className="border border-gray-300 px-4 py-2">₹{totalAmount}</td>
-                    <td className="border border-gray-300 px-4 py-2">₹{paidAmount}</td>
+                    <td className="border border-gray-300 px-4 py-2">₹{paidAmounttotal} </td>
                     <td className="border border-gray-300 px-4 py-2">₹{due}</td>
                     <td
                       className={`border border-gray-300 px-4 py-2 font-semibold ${status === "Paid" ? "text-green-600" : "text-yellow-600"

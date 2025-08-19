@@ -1,4 +1,5 @@
 import type { Unsubscribe } from "firebase/auth";
+import type { Timestamp } from "firebase/firestore";
 
 export interface UserData {
     uid: string;
@@ -30,7 +31,9 @@ export type StudentDetails = {
     email: string;
     courseId: string;
     paidAmount: number;
-    createdAt?: Date ;
+    createdAt?: Timestamp ;
+    course?: Coursetype;
+    payment?: Payment[];
 
 };
 
@@ -51,6 +54,13 @@ export interface Coursetype {
     id: string;
     courseName: string;
     duration: number;
-    fees: string;
-    admissionfee:string;
+    fees: number;
+    admissionfee:number;
+}
+
+export interface Payment {
+  id: string;
+  studentId: string; // to link payment to student
+  amount: number;
+  date: Timestamp;
 }

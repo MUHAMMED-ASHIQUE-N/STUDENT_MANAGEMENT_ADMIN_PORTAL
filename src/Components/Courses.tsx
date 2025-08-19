@@ -9,8 +9,8 @@ function Courses() {
   const [ editId, setEditId] = useState<string | null>(null)
   const [ courseName, setCourseName] = useState("");
   const [ duration, setDuration] = useState(0);
-  const [ fees, setFees] = useState("");
-  const [ admissionfee, setAdmissionFee] = useState("");
+  const [ fees, setFees] = useState(0);
+  const [ admissionfee, setAdmissionFee] = useState(0);
   const [ error, setError] = useState(null);
   const [ loading, setLoading ] = useState(false);
 
@@ -34,8 +34,8 @@ function Courses() {
     }
     setCourseName("");
     setDuration(0);
-    setFees("");
-    setAdmissionFee("");
+    setFees(0);
+    setAdmissionFee(0);
   }
 
 
@@ -53,7 +53,7 @@ function Courses() {
     return unsubscribe;
   }
 
-  const updateCourse = async (id:string, courseName:string, duration:number, fees:string, admissionfee:string) => {
+  const updateCourse = async (id:string, courseName:string, duration:number, fees:number, admissionfee:number) => {
     setLoading(true)
     try  {
       const courseRef = doc(db, "courses", id);
@@ -129,7 +129,7 @@ const deleteCourse = async (id:string) => {
                 <input
                   type="text"
                   value={fees}
-                  onChange={(e) => setFees(e.target.value)}
+                  onChange={(e) => setFees(Number((e.target.value))) }
                   placeholder='course Fees'
                   required
                   className='border border-gray-400 rounded-md py-2 px-3' />
@@ -137,7 +137,7 @@ const deleteCourse = async (id:string) => {
                 <input
                   type="text"
                   value={admissionfee}
-                  onChange={(e) => setAdmissionFee(e.target.value)}
+                  onChange={(e) => setAdmissionFee( Number(e.target.value))}
                   placeholder='Admission Fees'
                   required
                   className='border border-gray-400 rounded-md py-2 px-3' />

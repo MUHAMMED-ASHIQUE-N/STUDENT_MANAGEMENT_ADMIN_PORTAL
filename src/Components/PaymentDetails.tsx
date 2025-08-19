@@ -4,6 +4,7 @@ import { db } from '../firebase/config'
 import type { Coursetype, StudentDetails } from '../type/auth'
 import { useParams } from 'react-router-dom'
 import { format } from 'date-fns'
+import { calculatePaymentSummary } from '../utils/paymentUtils'
 
 function PaymentDetails() {
     const { id } = useParams()
@@ -18,8 +19,8 @@ function PaymentDetails() {
 
     const currentId = students.find((s) => s.id === id)
     const course = courses.find((c) => c.id === currentId?.courseId)
-    const expected = parseInt((course?.fees || 0)) / (course?.duration || 0)
-    const totalFess = (parseInt(course?.fees)) + (parseInt(course?.admissionfee) || 0)
+    const expected = ((course?.fees || 0)) / (course?.duration || 0)
+    const totalFess = (Number(course?.fees)) + (Number(course?.admissionfee) || 0)
     const coursePaidAmount = payments.reduce((sum, p) => sum + p.amount, 0)
     const totalypaidAmount = coursePaidAmount + currentId?.paidAmount
     const balanceAmount = totalFess - totalypaidAmount
@@ -105,7 +106,7 @@ function PaymentDetails() {
                             <td className="border border-gray-300 px-4 py-2">{ } Admission fee</td>
                             <td className="border border-gray-300 px-4 py-2">₹{course?.admissionfee}</td>
                             <td className="border border-gray-300 px-4 py-2">₹{currentId?.paidAmount}</td>
-                            <td className="border border-gray-300 px-4 py-2">₹{parseInt(course?.admissionfee) - currentId?.paidAmount}</td>
+                            <td className="border border-gray-300 px-4 py-2">₹{Number(course?.admissionfee) -( currentId?.paidAmount || 0)}</td>
                             <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
                                 <a href={''} target="_blank" rel="noopener noreferrer">
                                     View
@@ -130,7 +131,7 @@ function PaymentDetails() {
                             ))}
                     </tbody>
                 </table>
-                {balanceAmount === 0 ? (
+                {balanceAmount === 0 || balanceAmount <0 ? (
                     <p className='text-green-500 text-xl'>transaction compleated </p>
                 ) : (
                     <button

@@ -16,7 +16,7 @@ function Students() {
   const [paidAmount, setPaidAmount] = useState(0);
   const [courseId, setCourseId] = useState("");
   const [courses, setCourses] = useState<Coursetype[]>([]);
-  
+
 
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function Students() {
     setEditId(student.id);
     setName(student.name);
     setEmail(student.email);
-    setCourseId(student.course);
+    setCourseId(student.courseId);
     setPaidAmount(student.paidAmount);
     setPassword("");
 
@@ -109,7 +109,7 @@ function Students() {
             )}
 
 
-    <label htmlFor="course">select course</label>
+            <label htmlFor="course">select course</label>
             <select
               value={courseId}
               onChange={(e) => setCourseId(e.target.value)}
@@ -119,7 +119,7 @@ function Students() {
               <option value="">Select Course</option>
               {courses.map(course => (
                 <option key={course.id} value={course.id}>
-                  {course.courseName} 
+                  {course.courseName}
                 </option>
               ))}
             </select>
