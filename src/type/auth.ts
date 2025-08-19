@@ -30,24 +30,13 @@ export type StudentDetails = {
     name: string;
     email: string;
     courseId: string;
-    paidAmount: number;
+    admissionFee: number;
+    advanceFee:number;
     createdAt?: Timestamp ;
     course?: Coursetype;
     payment?: Payment[];
-
+    checkpointNO: number;
 };
-
-
-export interface StudentContextType {
-    createStudent: (name: string, email: string, password: string, courseId: string, paidAmount: number) => Promise<void>;
-    subscribeStudents: () => Unsubscribe;
-    updatedStudent: (id: string, name: string, email: string, courseId: string, paidAmount: number) => Promise<void>;
-    deleteStudent: (id: string) => Promise<void>;
-    stdDetails: StudentDetails[] | null;
-    loading: boolean;
-    error: string | null;
-}
-
 
 
 export interface Coursetype {
@@ -56,6 +45,7 @@ export interface Coursetype {
     duration: number;
     fees: number;
     admissionfee:number;
+    defaultCheckpoint: number;
 }
 
 export interface Payment {

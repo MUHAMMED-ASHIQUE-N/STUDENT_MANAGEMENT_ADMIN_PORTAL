@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { addDoc, collection, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import type { Coursetype, StudentDetails } from '../type/auth'
 import { useParams } from 'react-router-dom'
 import { format } from 'date-fns'
-import { calculatePaymentSummary } from '../utils/paymentUtils'
+import { subscribeStudents, subscribeCourses, subscribePayments, addPayment, calculateTotals } from '../utils/paymentUtils'
 
 function PaymentDetails() {
     const { id } = useParams()
@@ -19,56 +18,31 @@ function PaymentDetails() {
 
     const currentId = students.find((s) => s.id === id)
     const course = courses.find((c) => c.id === currentId?.courseId)
-    const expected = ((course?.fees || 0)) / (course?.duration || 0)
-    const totalFess = (Number(course?.fees)) + (Number(course?.admissionfee) || 0)
-    const coursePaidAmount = payments.reduce((sum, p) => sum + p.amount, 0)
-    const totalypaidAmount = coursePaidAmount + currentId?.paidAmount
-    const balanceAmount = totalFess - totalypaidAmount
+
+    const { totalFee, paidAmount, dueAmount, expectedPerMonth } = calculateTotals(currentId!, course, payments)
 
 
     useEffect(() => {
-        const unsubStudents = onSnapshot(collection(db, "userDetails"), (snapshot) => {
-            const student = snapshot.docs.map(doc => ({
-                id: doc.id, ...(doc.data() as Omit<StudentDetails, "id">)
-            }))
-            setStudents(student)
-        });
-
-        const unsubCourses = onSnapshot(collection(db, "courses"), (snapshot) => {
-            const course = snapshot.docs.map(doc => ({
-                id: doc.id, ...(doc.data() as Omit<Coursetype, "id">)
-            }))
-            setCourses(course)
-        });
-
+        const unsubStudents = subscribeStudents(db, setStudents);
+        const unsubCourses = subscribeCourses(db, setCourses);
+        let unsubPayments: (() => void) | undefined
 
         if (id) {
-            const unsubPayments = onSnapshot(collection(db, `userDetails/${id}/payment`), (snapshot) => {
-                const pay = snapshot.docs.map(doc => ({
-                    id: doc.id, ...(doc.data())
-                }))
-                setPayments(pay)
-            })
-            return () => {
-                unsubStudents(), unsubCourses(), unsubPayments()
-            }
+            unsubPayments = subscribePayments(db, id, setPayments)
         }
+
         return () => {
             unsubStudents();
             unsubCourses();
+            unsubPayments && unsubPayments();
         }
-    }, [id]);
+    }, [id])
 
 
     const handleAddPayment = async () => {
-        if (!id && amount <= 0) return null;
+        if (!id || amount <= 0) return null;
 
-        await addDoc(collection(db, `userDetails/${id}/payment`), {
-            date: new Date(),
-            checkpoint,
-            amount,
-            receipturl: ""
-        })
+        await addPayment(db, id, course?.id, amount, checkpoint)
         setAmount(0)
         setCheckpoint("")
         setShowForm(false)
@@ -77,16 +51,15 @@ function PaymentDetails() {
 
     return (
         <div >
-
             <h1 className='text-center text-xl font-bold'>All payment Details  </h1>
             <div className=''>
                 <h1>Student Name: {currentId?.name} </h1>
                 <p>Course:{course?.courseName} </p>
                 <p>Course fee:{course?.fees} </p>
                 <p>Admission fee:{course?.admissionfee} </p>
-                <p>total fee:{totalFess} </p>
-                <p>totaly paid Amount : {totalypaidAmount} </p>
-                <p>Balance Amount : {balanceAmount} </p>
+                <p>total fee:{totalFee} </p>
+                <p>total paid: {paidAmount} </p>
+                <p>dueAmount Amount : {dueAmount} </p>
             </div>
             <div className='w-'>
                 <table className="w-full border-collapse border border-gray-300">
@@ -101,25 +74,20 @@ function PaymentDetails() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="border border-gray-300 px-4 py-2">{currentId?.createdAt && format(currentId?.createdAt.toDate(), "dd MMM yyyy")} date</td>
-                            <td className="border border-gray-300 px-4 py-2">{ } Admission fee</td>
-                            <td className="border border-gray-300 px-4 py-2">₹{course?.admissionfee}</td>
-                            <td className="border border-gray-300 px-4 py-2">₹{currentId?.paidAmount}</td>
-                            <td className="border border-gray-300 px-4 py-2">₹{Number(course?.admissionfee) -( currentId?.paidAmount || 0)}</td>
-                            <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
-                                <a href={''} target="_blank" rel="noopener noreferrer">
-                                    View
-                                </a>
-                            </td>
-                        </tr>
-                        {payments.map((p) => (
+                        {payments.map((p) => {
+                            const isAdmission = p.checkpoint === "Admission Fee";
+                            const expected = isAdmission ? course?.admissionfee : expectedPerMonth;
+                            const due = (expected || 0) - p.amount;
+
+                            return (
                                 <tr key={p.id} >
-                                    <td className="border border-gray-300 px-4 py-2">{format(p.date.toDate(), "dd MMM yyyy")} </td>
+                                    <td className="border border-gray-300 px-4 py-2">
+                                        {format(p.date.toDate(), "dd MMM yyyy")}
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2">{p.checkpoint || "unknow"} </td>
                                     <td className="border border-gray-300 px-4 py-2">₹{expected}</td>
                                     <td className="border border-gray-300 px-4 py-2">₹{p.amount}</td>
-                                    <td className="border border-gray-300 px-4 py-2">₹{expected - p.amount}</td>
+                                    <td className="border border-gray-300 px-4 py-2">{due > 0 ? "due" : 0}</td>
                                     <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
                                         {p.receiptUrl ? (
                                             <a href={p.receiptUrl} target="_blank" rel="noopener noreferrer">
@@ -128,10 +96,11 @@ function PaymentDetails() {
                                         ) : (<p>upload</p>)}
                                     </td>
                                 </tr>
-                            ))}
+                            )
+                        })}
                     </tbody>
                 </table>
-                {balanceAmount === 0 || balanceAmount <0 ? (
+                {dueAmount === 0 || dueAmount < 0 ? (
                     <p className='text-green-500 text-xl'>transaction compleated </p>
                 ) : (
                     <button
@@ -139,7 +108,6 @@ function PaymentDetails() {
                         className='text-blue-500 mt-2'>
                         New Payment</button>
                 )}
-
             </div>
 
             {showForm && (
@@ -178,7 +146,6 @@ function PaymentDetails() {
                     </button>
                 </div>
             )}
-
         </div>
     )
 }

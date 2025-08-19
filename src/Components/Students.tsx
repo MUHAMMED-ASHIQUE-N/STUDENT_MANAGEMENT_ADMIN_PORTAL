@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useStudent } from '../context/StudentContext';
+import { createStudent, updatedStudent } from '../utils/studentUtils';
 import StudentList from './StudentList';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -7,16 +7,35 @@ import type { Coursetype } from '../type/auth';
 
 function Students() {
 
-  const { createStudent, loading, error, updatedStudent } = useStudent();
 
-  const [editId, setEditId] = useState<string | null>(null)
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [paidAmount, setPaidAmount] = useState(0);
+  const [admissionFee, setAdmissionFee] = useState(0);
+  const [advanceFee, setAdvanceFee] = useState(0);
+  // const [checkpoint, setCheckpoint] = useState('');
+  const [checkpointNO, setCheckpointNO] = useState(0);
   const [courseId, setCourseId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [editId, setEditId] = useState<string | null>(null)
   const [courses, setCourses] = useState<Coursetype[]>([]);
 
+
+  useEffect(() => {
+    if (courseId) {
+      const selectedCourse = courses.find(c => c.id === courseId);
+      if (selectedCourse) {
+        setCheckpointNO(selectedCourse.defaultCheckpoint || 1);
+      }
+    }
+  }, [courseId, courses]);
+
+
+  const selectedCourse = courses.find(c => c.id === courseId);
+  const totalFee = (Number(selectedCourse?.fees) || 0) + (Number(selectedCourse?.admissionfee) || 0);
+  const totalCoursefee = Number(selectedCourse?.fees) || 0
+  // const perCheckpointFee = checkpointNO > 0 ? Math.round(totalFee / checkpointNO) : 0;
 
 
   useEffect(() => {
@@ -30,28 +49,41 @@ function Students() {
     fetchCourses();
   }, [])
 
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true)
+    try {
+      if (editId) {
+        await updatedStudent(editId, name, email, courseId, admissionFee, advanceFee);
+        console.log('student edit success');
+        setEditId(null)
 
-    if (editId) {
-      updatedStudent(editId, name, email, courseId, paidAmount);
-      console.log('student edit success');
-      setEditId(null)
+      }
+      else {
+        await createStudent(name, email, password, courseId, admissionFee, advanceFee, checkpointNO)
+        console.log('student created successfully');
+
+      }
+    }
+    catch (err: any) {
+      setError(err.message,), console.log('somthing worng cannot create srudent');
 
     }
-    else {
-      await createStudent(name, email, password, courseId, paidAmount);
-      console.log('student create successfullyyy', name, paidAmount);
+    finally {
+      setLoading(false)
+      setError("")
     }
-
 
     setName("")
     setEmail("")
     setPassword("")
     setCourseId("")
-    setPaidAmount(0)
-
+    setAdmissionFee(0)
+    setAdvanceFee(0)
   }
+
 
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -60,12 +92,14 @@ function Students() {
     setName(student.name);
     setEmail(student.email);
     setCourseId(student.courseId);
-    setPaidAmount(student.paidAmount);
+    setAdmissionFee(student.admissionFee);
+    setAdvanceFee(student.advanceFee);
     setPassword("");
 
     formRef.current?.scrollIntoView({ behavior: "smooth" });
 
   }
+
 
   return (
     <div className='p-8'>
@@ -124,13 +158,30 @@ function Students() {
               ))}
             </select>
 
-
-            <label htmlFor="">Amount Paid</label>
+            <label className="block mb-2 font-semibold">Checkpoint</label>
+            <select
+              value={checkpointNO}
+              onChange={(e) => setCheckpointNO(Number(e.target.value))}
+              className="border px-2 py-1 rounded"
+            >
+              {Array.from({ length: (selectedCourse?.defaultCheckpoint || selectedCourse?.duration) || 0 }, (_, i) => i + 1).map((cp) => (
+                <option key={cp} value={cp}>
+                  {cp} month{cp > 1 ? 's' : ''} (₹{Math.round(totalCoursefee / cp)})
+                </option>
+              ))}
+            </select>
+            <label htmlFor="">Admission Fee</label>
             <input type="text"
-              value={paidAmount}
-              onChange={(e) => setPaidAmount(Number(e.target.value))}
-              placeholder='Amound paid'
-              required
+              value={admissionFee}
+              onChange={(e) => setAdmissionFee(Number(e.target.value))}
+              placeholder='Admission fee'
+              className='border border-gray-400 rounded-md py-2 px-3 ' />
+
+            <label htmlFor="">Advance Fee</label>
+            <input type="text"
+              value={advanceFee}
+              onChange={(e) => setAdvanceFee(Number(e.target.value))}
+              placeholder='Advance fee'
               className='border border-gray-400 rounded-md py-2 px-3 ' />
           </div>
 
