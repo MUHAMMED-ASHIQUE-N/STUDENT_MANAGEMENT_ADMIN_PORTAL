@@ -16,14 +16,41 @@ export interface AuthContextType {
     logout: () => Promise<void>;
 }
 
-// export interface Student {
+
+
+// export type StudentDetails = {
 //     id: string;
 //     name: string;
 //     email: string;
-//     course: string;
-//     createdAt: Date;
-//     role: "admin" | "student";
+//     courseId: string;
+//     admissionFee: number;
+//     advanceFee: number;
+//     createdAt?: Timestamp;
+//     course?: Coursetype;
+//     payment?: Payment[];
+//     selectedCheckpoints: {
+//         title: string;
+//         amount: number;
+//         dueOrder: number;
+//     }[];
+// };
+
+
+// export interface Coursetype {
+//     id: string;
+//     courseName: string;
+//     description: string;
+//     category: string;
+//     duration: number;
+//     courseFee: number;
+//     admissionFee: number;
+//     paymentCheckpoints: {
+//         title: string;
+//         amount: number;
+//         dueOrder: number;
+//     }[];
 // }
+
 
 export type StudentDetails = {
     id: string;
@@ -31,26 +58,49 @@ export type StudentDetails = {
     email: string;
     courseId: string;
     admissionFee: number;
-    advanceFee:number;
-    createdAt?: Timestamp ;
+    cautionDeposit: number;
+    createdAt?: Timestamp;
     course?: Coursetype;
     payment?: Payment[];
-    checkpointNO: number;
+    checkpoints: {
+        title: string;
+        amount: number;
+        dueOrder: number;
+    }[];
 };
 
 
 export interface Coursetype {
     id: string;
-    courseName: string;
+    title: string;
+    description: string;
+    category: string;
     duration: number;
-    fees: number;
-    admissionfee:number;
-    defaultCheckpoint: number;
+    fees: {
+        courseFee: number;
+        admissionFee: number;
+        cautionDeposit: number;
+    };
+    checkpoints: {
+        title: string;
+        amount: number;
+        dueOrder: number;
+    }[];
+
+
 }
 
+
+
 export interface Payment {
-  id: string;
-  studentId: string; // to link payment to student
-  amount: number;
-  date: Timestamp;
+    id: string;
+    studentId: string;
+    courseId: string;
+    title: string;
+    amount: number;
+    checkpointDueOrder: number;
+    date: Timestamp;
+    status: "pending" | "paid";
+    receiptUrl?: string | null;
 }
+

@@ -55,12 +55,17 @@ const Payment = () => {
               {students.map((student) => {
                 const course = courses.find((c) => c.id === student.courseId);
                 const studentPayments = payments.filter((p) => p.studentId === student.id);
-                const { totalFee, paidAmount, dueAmount } = calculateTotals(student, course, studentPayments);
+                const { totalFee, paidAmount, dueAmount } = calculateTotals(student, studentPayments);
+
+
+                
+
+
                 const status = dueAmount === 0 ? "Paid" : "Partially Paid";
                 return (
                   <tr key={student.id}>
                     <td className="border border-gray-300 px-4 py-2">{student.name}</td>
-                    <td className="border border-gray-300 px-4 py-2">{course?.courseName || 'unknow course'}</td>
+                    <td className="border border-gray-300 px-4 py-2">{course?.title || 'unknow course'}</td>
                     <td className="border border-gray-300 px-4 py-2">₹{totalFee}</td>
                     <td className="border border-gray-300 px-4 py-2">₹{paidAmount} </td>
                     <td className="border border-gray-300 px-4 py-2">₹{dueAmount}</td>

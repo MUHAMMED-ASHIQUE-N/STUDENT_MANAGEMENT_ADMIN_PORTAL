@@ -15,16 +15,16 @@ function StudentList({ onEdit, courses }: { onEdit: (student: any) => void; cour
 
   const getCourseName = (courseId: string) => {
     const course = courses.find((c) => c.id === courseId);
-    return course ? course.courseName : 'unknow course';
+    return course ? course.title : 'unknow course';
 
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteStudent(id)
+  const handleDelete = async (student:StudentDetails) => {
+    await deleteStudent(student.id, student.name,student.email, student.courseId )
   }
 
   return (
-    <div>
+    <div className='mt-8'>
       <h1>Student Details</h1>
       {students?.map((student) => (
         <div
@@ -39,7 +39,7 @@ function StudentList({ onEdit, courses }: { onEdit: (student: any) => void; cour
             onClick={() => onEdit(student)}
             className='bg-red-500/80 px-4 py-2 rounded-md text-white'>edit</button>
           <button
-            onClick={() => handleDelete(student.id)}
+            onClick={() => handleDelete(student)}
             className='bg-red-500/80 px-4 py-2 rounded-md text-white'>delete</button>
         </div>
       ))}
