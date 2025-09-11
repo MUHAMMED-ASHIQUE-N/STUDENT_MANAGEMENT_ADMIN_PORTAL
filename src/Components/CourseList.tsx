@@ -12,7 +12,6 @@ function CourseList({
   onDelete: (dataId: string) => void;
   courses: Coursetype[] | undefined;
 }) {
-  console.log(courses?.map((c) => c.category))
   
   return (
     <div>
@@ -34,7 +33,6 @@ function CourseList({
             <p><span className="font-semibold">Duration:</span> {data.duration} months</p>
             <p><span className="font-semibold">Course Fee:</span> ₹{data.fees?.courseFee}</p>
             <p><span className="font-semibold">Admission Fee:</span> ₹{data.fees?.admissionFee}</p>
-            <p><span className="font-semibold">caution Deposit:</span> ₹{data.fees?.cautionDeposit}</p>
           </div>
 
           {/* 🔹 Payment Checkpoints */}

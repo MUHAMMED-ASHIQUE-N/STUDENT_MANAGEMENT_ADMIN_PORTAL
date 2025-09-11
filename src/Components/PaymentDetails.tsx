@@ -59,7 +59,6 @@ function PaymentDetails() {
                 <p>Course:{course?.title} </p>
                 <p>Course fee:{course?.fees.courseFee} </p>
                 <p>Admission fee:{course?.fees.admissionFee} </p>
-                <p>Caution Deposit:{course?.fees.cautionDeposit} </p>
                 <p>total fee:{totalFee} </p>
                 <p>total paid: {paidAmount} </p>
                 <p>dueAmount Amount : {dueAmount} </p>

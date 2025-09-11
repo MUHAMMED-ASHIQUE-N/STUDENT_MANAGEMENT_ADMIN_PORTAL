@@ -58,7 +58,6 @@ export type StudentDetails = {
     email: string;
     courseId: string;
     admissionFee: number;
-    cautionDeposit: number;
     createdAt?: Timestamp;
     course?: Coursetype;
     payment?: Payment[];
@@ -79,7 +78,6 @@ export interface Coursetype {
     fees: {
         courseFee: number;
         admissionFee: number;
-        cautionDeposit: number;
     };
     checkpoints: {
         title: string;

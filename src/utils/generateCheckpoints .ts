@@ -79,7 +79,7 @@ export interface Checkpoint {
 export const generateCheckpoints = (
   totalFee: number,
   admissionFee: number,
-  cautionDeposit: number = 0,
+  // cautionDeposit: number = 0,
   duration: number,
   customCheckpoints: Checkpoint[] = []
 ): Checkpoint[] => {
@@ -96,9 +96,7 @@ export const generateCheckpoints = (
   const hasAdmission = validCustom.some(
     (cp) => cp.title.toLowerCase() === "admission fee"
   );
-  const hasCautionDeposit = validCustom.some(
-    (cp) => cp.title.toLowerCase() === "Caution Deposit"
-  );
+
 
   // Admission fee always first
   if (admissionFee > 0 && !hasAdmission) {
@@ -111,16 +109,6 @@ export const generateCheckpoints = (
 
   }
 
-  // Advance fee always second
-  if (cautionDeposit > 0 && !hasCautionDeposit) {
-    checkpoints.push({
-      title: "Caution Deposit",
-      amount: cautionDeposit,
-      dueOrder: order++,
-    });
-    remainingFee -= cautionDeposit;
-
-  }
 
   // If custom plan provided
   if (validCustom.length > 0) {
