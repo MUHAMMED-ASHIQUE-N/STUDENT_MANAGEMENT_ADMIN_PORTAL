@@ -9,10 +9,10 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-    const authContex = useContext(AuthContext);
-    if (!authContex) return null;
+    const authContext = useContext(AuthContext);
+    if (!authContext) return null;
 
-    const { user, loading } = authContex;
+    const { user, loading } = authContext;
 
     if (loading) return <p>Loading... </p>
 

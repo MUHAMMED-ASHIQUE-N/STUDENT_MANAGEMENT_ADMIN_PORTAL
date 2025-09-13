@@ -15,7 +15,12 @@ function Router() {
         <Routes>
             <Route path='/institution/login' element={<AdminLogin />} />
 
-            <Route path='/institution' element={ <Home />}>                   
+            <Route path='/institution' element={    <Home />
+}
+                // <ProtectedRoute requiredRole='admin'>
+                //      <Home />
+                // </ProtectedRoute>
+                >                   
                 <Route path='dashboard' element={<Dashboard />} />
                 <Route path='students' element={<Students />} />
                 <Route path='courses' element={<Courses />} />

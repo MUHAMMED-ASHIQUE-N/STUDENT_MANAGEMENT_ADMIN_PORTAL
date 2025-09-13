@@ -45,9 +45,9 @@ function PaymentDetails() {
         if (!id || !course || !nextDue) return alert("No Checkpoint Due!")   //    return null;
         await addPayment(db, currentId!, receiptUrl)
 
-        setAmount(0)
-        setCheckpoint("")
-        setShowForm(false)
+        // setAmount(0)
+        // setCheckpoint("")
+        // setShowForm(false)
 
     }
 
@@ -113,6 +113,7 @@ function PaymentDetails() {
 
             {nextDue && !payments.find(p => p.checkpointDueOrder === nextDue.dueOrder && p.status === "pending") ? (
                 <div className="mt-4 p-4 border rounded bg-gray-100">
+                    
                     <h2 className="font-bold mb-2">Add New Payment</h2>
                     {/* <input
                         type="text"

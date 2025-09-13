@@ -3,6 +3,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebas
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import type { AuthContextType, UserData } from '../type/auth';
+import { el } from 'date-fns/locale';
 
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +16,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const login = async (email: string, password: string) => {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         
-        const docsnap = await getDoc(doc(db, "users", cred.user.uid)); 
+        const docsnap = await getDoc(doc(db, "userDetails", cred.user.uid)); 
         if (docsnap.exists()) {
             setUser(docsnap.data() as UserData);
         }
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                const docsnap = await getDoc(doc(db, 'users', firebaseUser.uid));
+                const docsnap = await getDoc(doc(db, 'userDetails', firebaseUser.uid));
                 if (docsnap.exists()) {
                     setUser(docsnap.data() as UserData);
                 }
@@ -43,12 +44,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
                 
             }
+            else{
+                setUser(null);
+            }
             setLoading(false);
         });
 
         return () => unsubscribe();
 
     }, [])
+
+    
 
 
 
