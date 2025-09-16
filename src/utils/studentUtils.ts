@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase/config";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, runTransaction, setDoc, updateDoc } from "firebase/firestore";
 import type { StudentDetails } from "../type/auth";
 import { generateCheckpoints } from "./generateCheckpoints ";
 
@@ -55,6 +55,9 @@ export const createStudent = async (
       });
     }
   }
+
+  enrollStudentTransaction(courseId)
+
 };
 
 
@@ -109,6 +112,27 @@ export const deleteStudent = async (id: string, name: string, email: string, cou
 
 
 
+
+ async function enrollStudentTransaction(courseId:string) {
+  const courseRef = doc(db, "courses", courseId);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const courseDoc = await transaction.get(courseRef);
+
+      if (!courseDoc.exists()) {
+        throw "Course does not exist!";
+      }
+
+      const newCount = (courseDoc.data().studentCount || 0) + 1;
+      transaction.update(courseRef, { studentCount: newCount });
+    });
+
+    console.log("Transaction successfully committed!");
+  } catch (error) {
+    console.error("Transaction failed: ", error);
+  }
+}
 
 
 

@@ -32,25 +32,69 @@
 // // });
 
 
-import * as functions from "firebase-functions/v1";
-import * as admin from "firebase-admin";
+// import * as functions from "firebase-functions/v1";
+// import * as admin from "firebase-admin";
 
-// initialize the admin SDK so we can access Auth + Firestore
+// // initialize the admin SDK so we can access Auth + Firestore
+// admin.initializeApp();
+
+// /**
+//  * Trigger: When a student is deleted from Firestore "userDetails/{userId}"
+//  * Action: Delete their Auth account automatically
+//  */
+// export const deleteAuthUser = functions.firestore
+//   .document("userDetails/{userId}")
+//   .onDelete(async (snap, context) => {
+//     const userId = context.params.userId;
+
+//     try {
+//       await admin.auth().deleteUser(userId);
+//       console.log(`✅ Successfully deleted Auth user with UID: ${userId}`);
+//     } catch (error) {
+//       console.error("❌ Error deleting Auth user:", error);
+//     }
+//   });
+
+
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+
 admin.initializeApp();
 
-/**
- * Trigger: When a student is deleted from Firestore "userDetails/{userId}"
- * Action: Delete their Auth account automatically
- */
-export const deleteAuthUser = functions.firestore
-  .document("userDetails/{userId}")
-  .onDelete(async (snap, context) => {
-    const userId = context.params.userId;
+export const incrementStudentCount = functions.firestore.document('userDetails/{studentId}')
+    .onCreate(async (snap:any, context:any) => {
+        const studentData = snap.data();
+        const courseId = studentData.courseId;
 
-    try {
-      await admin.auth().deleteUser(userId);
-      console.log(`✅ Successfully deleted Auth user with UID: ${userId}`);
-    } catch (error) {
-      console.error("❌ Error deleting Auth user:", error);
-    }
-  });
+        if (courseId) {
+            const courseRef = admin.firestore().collection('courses').doc(courseId);
+
+            try {
+                // Use a transaction to safely increment the studentsCount
+                await admin.firestore().runTransaction(async (transaction:any) => {
+                    const courseDoc = await transaction.get(courseRef);
+
+                    if (!courseDoc.exists) {
+                        throw new Error('Course document does not exist!');
+                    }
+
+                    // Get the current student count or default to 0
+                    const currentCount = courseDoc.data().studentsCount || 0;
+                    const newCount = currentCount + 1;
+
+                    // Update the studentsCount field
+                    transaction.update(courseRef, { studentsCount: newCount });
+                });
+
+                console.log(`Student count for course ${courseId} incremented successfully.`);
+            } catch (error) {
+                console.error(`Transaction failed for course ${courseId}:`, error);
+            }
+        }
+    });
+
+
+
+
+
+
