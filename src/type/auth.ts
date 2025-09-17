@@ -17,6 +17,28 @@ export interface AuthContextType {
 }
 
 
+export interface DashContextType {
+    totalStudents: number;
+    totalRevenue: number;
+    totalDues: number;
+    activeCourses: number;
+    pendingCertificates: number;
+    topCourses: {
+        id: string;
+        title: string;
+        students: number;
+    }[];
+    studentGraphData: {
+        name: string | number;
+        students: string | number;
+    }[];
+    revenueGraphData: {
+        name: string | number;
+        totalRevenue: string | number;
+    }[],
+}
+
+
 
 // export type StudentDetails = {
 //     id: string;
@@ -91,7 +113,7 @@ export interface Coursetype {
 
 
 export interface Payment {
-    id: string;
+    // id: string;
     studentId: string;
     courseId: string;
     title: string;

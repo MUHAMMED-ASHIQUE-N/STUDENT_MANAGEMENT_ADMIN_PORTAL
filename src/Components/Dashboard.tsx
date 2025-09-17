@@ -25,7 +25,7 @@
 //     });
 
 //     const unsubTotalStudents = onSnapshot(collection(db, "userDetails"), (snapshot) => {
-    
+
 //       setTotalStudents(snapshot.size)
 //     });
 
@@ -302,83 +302,34 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import { format } from 'date-fns';
+import { DashContext } from '../context/DashContext';
 
 function Dashboard() {
   const authContex = useContext(AuthContext);
   if (!authContex) return null;
+
+  const dashContext = useContext(DashContext);
+  if (!dashContext) return null
+
+  const {
+    totalStudents,
+    totalRevenue,
+    totalDues,
+    activeCourses,
+    pendingCertificates,
+    topCourses,
+    studentGraphData,
+    revenueGraphData
+  } = dashContext;
+
   const { user, logout } = authContex;
 
-  const [totalStudents, setTotalStudents] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [totalDues, setTotalDues] = useState(0);
-  const [activeCourses, setActiveCourses] = useState(0);
-  const [pendingCertificates, setPendingCertificates] = useState(12);
-  const [topCourses, setTopCourses] = useState<any[]>([]);
-  
-  // New states for graph data
-  const [studentGraphData, setStudentGraphData] = useState<any[]>([]);
-  const [revenueGraphData, setRevenueGraphData] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Other onSnapshot listeners remain the same...
-    const unsubPayments = onSnapshot(collection(db, 'payments'), (snapshot) => {
-        let currentTotalRevenue = 0;
-        let currentTotalDues = 0;
-        snapshot.forEach((doc) => {
-          const paymentData = doc.data();
-          currentTotalRevenue += Number(paymentData.amount) || 0;
-          if (paymentData.status === 'pending') {
-            currentTotalDues += Number(paymentData.amount) || 0;
-          }
-        });
-        setTotalRevenue(currentTotalRevenue);
-        setTotalDues(currentTotalDues);
-      });
-  
-      const unsubTotalStudents = onSnapshot(collection(db, 'userDetails'), (snapshot) => {
-        setTotalStudents(snapshot.size);
-      });
-  
-      const unsubActiveCourses = onSnapshot(collection(db, 'courses'), (snapshot) => {
-        let activeCount = 0;
-        let coursesList:any[] = [];
-        snapshot.forEach(doc => {
-          const courseData = doc.data();
-          if (courseData) {
-            activeCount++;
-            coursesList.push({ id: doc.id, title: courseData.title, students: courseData.studentsCount || 0 });
-          }
-        });
-        setActiveCourses(activeCount);
-        setTopCourses(coursesList.sort((a, b) => b.students - a.students).slice(0, 3));
-      });
-
-    // New listener for aggregated graph data
-    const metricsQuery = query(collection(db, 'dashboardMetrics'), orderBy('month', 'asc')); // Assuming 'month' is a sortable string like "2024-01"
-    const unsubMetrics = onSnapshot(metricsQuery, (snapshot) => {
-      const students:any[] = [];
-      const revenues:any[] = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        students.push({ name: data.month, students: data.totalStudents });
-        revenues.push({ name: data.month, totalRevenue: data.totalRevenue });
-      });
-      setStudentGraphData(students);
-      setRevenueGraphData(revenues);
-    });
-
-    return () => {
-      unsubPayments();
-      unsubTotalStudents();
-      unsubActiveCourses();
-      unsubMetrics(); // Don't forget to clean up this listener
-    };
-  }, []);
 
   return (
-    <div className="flex flex-col bg-gray-100 min-h-screen p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-800">Dashboard</h1>
+    <div className="flex flex-col min-h-screen md:p-6 overflow-hidden">
+      {/* <div className="flex justify-between items-center mb-6">
+        <h1 className="sm:text-3xl font-semibold text-gray-800">Dashboard</h1>
         <div className="flex items-center space-x-4">
           <button
             onClick={() => logout()}
@@ -389,7 +340,7 @@ function Dashboard() {
           <span className="text-gray-800 font-medium">{user?.email}</span>
           <BsPersonFill size={24} className="text-gray-500" />
         </div>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
 
@@ -423,10 +374,18 @@ function Dashboard() {
             <div className="p-3 bg-green-100 rounded-full">
               <BsCashStack size={24} className="text-green-500" />
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Revenue</p>
-              <h3 className="text-3xl font-bold text-gray-800">£{totalRevenue.toLocaleString()}</h3>
-            </div>
+            <div className='flex gap-8'>
+              <div>
+        <p className="text-sm text-gray-500">Total Revenue</p>
+              <h3 className="text-2xl font-bold text-gray-800">£{totalRevenue.toLocaleString()}</h3>
+             
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Total Dues</p>
+              <h3 className="text-2xl font-bold text-gray-800">£{totalDues.toLocaleString()}</h3>
+           
+              </div>
+                </div>
           </div>
           <div className="h-48 mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -489,10 +448,10 @@ function Dashboard() {
               <span className="font-medium">Add New Student</span>
               <BsPlusCircleFill size={20} />
             </a>
-              <a href="#" className="flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">
-                <span className="font-medium">Add New Course</span>
-                <BsPlusCircleFill size={20} />
-              </a>
+            <a href="#" className="flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">
+              <span className="font-medium">Add New Course</span>
+              <BsPlusCircleFill size={20} />
+            </a>
             <a href="#" className="flex items-center justify-between px-4 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-200 shadow-md">
               <span className="font-medium">Pending Certificates</span>
               <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{pendingCertificates}</span>

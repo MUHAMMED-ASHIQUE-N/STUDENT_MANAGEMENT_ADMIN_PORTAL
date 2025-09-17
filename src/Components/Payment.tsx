@@ -1,6 +1,6 @@
 
 import { collection, onSnapshot } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { db } from "../firebase/config";
 import type { Coursetype, StudentDetails } from "../type/auth";
 import { Link, Outlet, useLocation } from "react-router-dom";

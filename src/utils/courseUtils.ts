@@ -27,6 +27,7 @@ export const createCourse = async (
     await addDoc(collection(db, "courses"), {
       ...courseData,
     checkpoints: checkpoints ,
+    studentsCount:0,
       createdAt: serverTimestamp(),
     });
   };

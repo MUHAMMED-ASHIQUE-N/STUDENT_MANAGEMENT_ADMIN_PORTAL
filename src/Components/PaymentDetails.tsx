@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { db } from '../firebase/config'
 import type { Coursetype, StudentDetails } from '../type/auth'
 import { useParams } from 'react-router-dom'
@@ -55,13 +55,14 @@ function PaymentDetails() {
         <div >
             <h1 className='text-center text-xl font-bold'>All payment Details  </h1>
             <div className=''>
-                <h1>Student Name: {currentId?.name} </h1>
-                <p>Course:{course?.title} </p>
-                <p>Course fee:{course?.fees.courseFee} </p>
-                <p>Admission fee:{course?.fees.admissionFee} </p>
-                <p>total fee:{totalFee} </p>
-                <p>total paid: {paidAmount} </p>
-                <p>dueAmount Amount : {dueAmount} </p>
+                 <h2 className="text-lg font-semibold border-b pb-2">Student Info</h2>
+        <p><strong>Name:</strong> {currentId?.name}</p>
+        <p><strong>Course:</strong> {course?.title}</p>
+        <p><strong>Course Fee:</strong> ₹{course?.fees.courseFee}</p>
+        <p><strong>Admission Fee:</strong> ₹{course?.fees.admissionFee}</p>
+        <p><strong>Total Fee:</strong> ₹{totalFee}</p>
+        <p><strong>Paid Amount:</strong> ₹{paidAmount}</p>
+        <p><strong>Due Amount:</strong> ₹{dueAmount}</p>
             </div>
             <div className='w-'>
                 <table className="w-full border-collapse border border-gray-300">
@@ -87,10 +88,15 @@ function PaymentDetails() {
                                 <tr key={index} >
                                     <td className="border border-gray-300 px-4 py-2">
                                         {paid ? format(paid.date.toDate(), "dd MMM yyyy") : "-"}
+                                        
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2">{checkpoint.title || "unknow"} </td>
                                     <td className="border border-gray-300 px-4 py-2">₹{checkpoint.amount}</td>
-                                    <td className="border border-gray-300 px-4 py-2">{paid ? "paid" : "pending"}</td>
+                                    <td className="border border-gray-300 px-4 py-2">
+                                         <span className={`px-2 py-1 rounded text-xs font-semibold ${paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {paid ? 'Paid' : 'Pending'}
+                    </span>
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
                                         
                                         {/* {paid.receiptUrl? (
@@ -111,25 +117,13 @@ function PaymentDetails() {
                 </table>
             </div>
 
-            {nextDue && !payments.find(p => p.checkpointDueOrder === nextDue.dueOrder && p.status === "pending") ? (
+            <button  
+             onClick={() => setShowForm(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-4 cursor-pointer">Add New Payment</button>
+            {nextDue && !payments.find(p => p.checkpointDueOrder === nextDue.dueOrder && p.status === "pending" && showForm== true) ? (
                 <div className="mt-4 p-4 border rounded bg-gray-100">
                     
                     <h2 className="font-bold mb-2">Add New Payment</h2>
-                    {/* <input
-                        type="text"
-                        placeholder="Enter a checkpoint"
-                        value={checkpoint}
-                        onChange={(e) => setCheckpoint(e.target.value)}
-                        className="border p-2 w-full mb-2"
-                    />
-                    <input
-                        type="number"
-                        placeholder="Enter amount"
-                        value={amount}
-                        onChange={(e) => setAmount(Number(e.target.value))}
-                        className="border p-2 w-full mb-2"
-                    /> */}
-
                     <h2 className="font-bold">Next Payment: {nextDue.title} - ₹{nextDue.amount}</h2>
 
                     <input

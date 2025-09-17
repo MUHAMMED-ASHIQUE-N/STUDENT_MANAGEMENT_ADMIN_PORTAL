@@ -56,45 +56,78 @@
 //   });
 
 
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
+// import * as functions from 'firebase-functions';
+// import * as admin from 'firebase-admin';
 
+// admin.initializeApp();
+
+// export const incrementStudentCount = functions.firestore.document('userDetails/{studentId}')
+//     .onCreate(async (snap:any, context:any) => {
+//         const studentData = snap.data();
+//         const courseId = studentData.courseId;
+
+//         if (courseId) {
+//             const courseRef = admin.firestore().collection('courses').doc(courseId);
+
+//             try {
+//                 // Use a transaction to safely increment the studentsCount
+//                 await admin.firestore().runTransaction(async (transaction:any) => {
+//                     const courseDoc = await transaction.get(courseRef);
+
+//                     if (!courseDoc.exists) {
+//                         throw new Error('Course document does not exist!');
+//                     }
+
+//                     // Get the current student count or default to 0
+//                     const currentCount = courseDoc.data().studentsCount || 0;
+//                     const newCount = currentCount + 1;
+
+//                     // Update the studentsCount field
+//                     transaction.update(courseRef, { studentsCount: newCount });
+//                 });
+
+//                 console.log(`Student count for course ${courseId} incremented successfully.`);
+//             } catch (error) {
+//                 console.error(`Transaction failed for course ${courseId}:`, error);
+//             }
+//         }
+//     });
+
+
+
+
+
+
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 admin.initializeApp();
 
-export const incrementStudentCount = functions.firestore.document('userDetails/{studentId}')
-    .onCreate(async (snap:any, context:any) => {
-        const studentData = snap.data();
-        const courseId = studentData.courseId;
+const db = admin.firestore();
 
-        if (courseId) {
-            const courseRef = admin.firestore().collection('courses').doc(courseId);
+exports.updateStudentCountOnEnroll = functions.firestore
+  .document("enrollments/{enrollmentId}")
+  .onCreate(async (snap:any, context:any) => {
+    const data = snap.data();
+    const courseId = data.courseId;
 
-            try {
-                // Use a transaction to safely increment the studentsCount
-                await admin.firestore().runTransaction(async (transaction:any) => {
-                    const courseDoc = await transaction.get(courseRef);
-
-                    if (!courseDoc.exists) {
-                        throw new Error('Course document does not exist!');
-                    }
-
-                    // Get the current student count or default to 0
-                    const currentCount = courseDoc.data().studentsCount || 0;
-                    const newCount = currentCount + 1;
-
-                    // Update the studentsCount field
-                    transaction.update(courseRef, { studentsCount: newCount });
-                });
-
-                console.log(`Student count for course ${courseId} incremented successfully.`);
-            } catch (error) {
-                console.error(`Transaction failed for course ${courseId}:`, error);
-            }
-        }
+    const courseRef = db.collection("courses").doc(courseId);
+    await courseRef.update({
+      studentCount: admin.firestore.FieldValue.increment(1)
     });
 
+    console.log(`Student count incremented for course ${courseId}`);
+  });
 
+exports.updateStudentCountOnUnenroll = functions.firestore
+  .document("enrollments/{enrollmentId}")
+  .onDelete(async (snap:any, context:any) => {
+    const data = snap.data();
+    const courseId = data.courseId;
 
+    const courseRef = db.collection("courses").doc(courseId);
+    await courseRef.update({
+      studentCount: admin.firestore.FieldValue.increment(-1)
+    });
 
-
-
+    console.log(`Student count decremented for course ${courseId}`);
+  });
