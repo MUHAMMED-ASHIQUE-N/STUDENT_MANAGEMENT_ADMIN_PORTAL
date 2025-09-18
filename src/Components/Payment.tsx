@@ -33,9 +33,11 @@ const Payment = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white shadow rounded-lg">
+    <div className="p-6">
+
+    <div className="p-6  bg-white shadow rounded-lg overflow-auto">
       {location.pathname.endsWith("/payment") ? (
-        <div>
+        <div className="">
           <h2 className="text-xl font-bold mb-4">Payment </h2>
           <table className="w-full border-collapse border border-gray-300">
             <thead className="bg-gray-100">
@@ -56,11 +58,6 @@ const Payment = () => {
                 const course = courses.find((c) => c.id === student.courseId);
                 const studentPayments = payments.filter((p) => p.studentId === student.id);
                 const { totalFee, paidAmount, dueAmount } = calculateTotals(student, studentPayments);
-
-
-                
-
-
                 const status = dueAmount === 0 ? "Paid" : "Partially Paid";
                 return (
                   <tr key={student.id}>
@@ -84,8 +81,11 @@ const Payment = () => {
             </tbody>
           </table>
         </div>
+        
       ) : (<Outlet />)}
     </div>
+        </div>
+
   );
 };
 

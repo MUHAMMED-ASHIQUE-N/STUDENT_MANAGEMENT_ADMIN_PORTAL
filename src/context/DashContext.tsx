@@ -27,7 +27,9 @@ export const DashProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             snapshot.forEach((doc) => {
                 const paymentData = doc.data();
-                currentTotalRevenue += Number(paymentData.amount) || 0;
+                if (paymentData.status === 'paid') {
+                    currentTotalRevenue += Number(paymentData.amount) || 0;
+                }
                 if (paymentData.status === 'pending') {
                     currentTotalDues += Number(paymentData.amount) || 0;
                 }
@@ -38,7 +40,9 @@ export const DashProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (!monthMap[month]) {
                     monthMap[month] = 0;
                 }
-                monthMap[month] += Number(paymentData.amount) || 0;
+                if (paymentData.status === 'paid'){
+                    monthMap[month] +=  Number(paymentData.amount) || 0 
+                }
             });
 
             const graphData = Object.keys(monthMap).sort().map(month => ({

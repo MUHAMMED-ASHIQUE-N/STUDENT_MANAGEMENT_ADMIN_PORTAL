@@ -304,6 +304,7 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { DashContext } from '../context/DashContext';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const authContex = useContext(AuthContext);
@@ -323,25 +324,10 @@ function Dashboard() {
     revenueGraphData
   } = dashContext;
 
-  const { user, logout } = authContex;
 
 
   return (
     <div className="flex flex-col min-h-screen md:p-6 overflow-hidden">
-      {/* <div className="flex justify-between items-center mb-6">
-        <h1 className="sm:text-3xl font-semibold text-gray-800">Dashboard</h1>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => logout()}
-            className="text-gray-600 hover:text-red-500 transition-colors duration-200"
-          >
-            Logout
-          </button>
-          <span className="text-gray-800 font-medium">{user?.email}</span>
-          <BsPersonFill size={24} className="text-gray-500" />
-        </div>
-      </div> */}
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
 
         {/* Total Students Widget with Graph */}
@@ -448,6 +434,7 @@ function Dashboard() {
               <span className="font-medium">Add New Student</span>
               <BsPlusCircleFill size={20} />
             </a>
+           
             <a href="#" className="flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">
               <span className="font-medium">Add New Course</span>
               <BsPlusCircleFill size={20} />

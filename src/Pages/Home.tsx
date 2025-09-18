@@ -5,9 +5,9 @@ import Sidebar from '../Components/Sidebar'
 
 function Home() {
     return (
-        <div className='h-screen'>
+        <div className='h-screen pb-14 md:pb-0'>
             <AdminNavbar/>
-            <div className='bg-amber-300 w-full h-[90%] flex'>
+            <div className=' w-full h-[90%] flex'>
                 <div className="flex h-full overflow-hidden">
 
                     <Sidebar />

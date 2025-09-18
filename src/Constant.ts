@@ -1,4 +1,8 @@
-import homeIcon from './assets/user.jpg'
+import homeIcon from './assets/dashboard1.png'
+import students from './assets/user.png'
+import course from './assets/book.png'
+import certificate from './assets/online-certificate.png'
+import payment from './assets/doller.png'
 
 const AdminPath = {
     Dashboard: 'dashboard',
@@ -9,12 +13,13 @@ const AdminPath = {
 };
 
 
-
 export const AdminMenuItems = [
     { Path:AdminPath.Dashboard, icon: homeIcon, label: 'Dashboard'},
-    { Path:AdminPath.Students, icon: homeIcon, label: 'Student'},
-    { Path:AdminPath.Courses, icon: homeIcon, label: 'Courses'},
-    { Path:AdminPath.Certificate, icon: homeIcon, label: 'Certificate'},
-    { Path:AdminPath.Payment, icon: homeIcon, label: 'Payment'},
+    { Path:AdminPath.Students, icon: students, label: 'Student'},
+    { Path:AdminPath.Courses, icon: course, label: 'Courses'},
+    { Path:AdminPath.Certificate, icon: certificate, label: 'Certificate'},
+    { Path:AdminPath.Payment, icon: payment, label: 'Payment'},
 
 ];
+
+
