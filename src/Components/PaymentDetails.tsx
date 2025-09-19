@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { db } from '../firebase/config'
 import type { Coursetype, StudentDetails } from '../type/auth'
 import { useParams } from 'react-router-dom'
@@ -13,10 +13,9 @@ function PaymentDetails() {
     const [courses, setCourses] = useState<Coursetype[]>([])
     const [payments, setPayments] = useState<any[]>([])
     const [showForm, setShowForm] = useState(false);
-    const [amount, setAmount] = useState(0);
-    const [checkpoint, setCheckpoint] = useState("");
     const [receiptUrl, setReceiptUrl] = useState<string | null>("");
 
+  const formRef = useRef<HTMLDivElement>(null);
 
     const currentId = students.find((s) => s.id === id)
     const course = courses.find((c) => c.id === currentId?.courseId)
@@ -48,12 +47,16 @@ function PaymentDetails() {
         // setAmount(0)
         // setCheckpoint("")
         setShowForm(false)
+    }
 
+    const handleFormOpen = () => {
+        setShowForm(true)
+        formRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
     return (
         <div className=''>
-            <h1 className='text-center text-xl font-bold'> Payment History  </h1>
+            <h1 className='md:text-center text-xl font-bold'> Payment History  </h1>
             <div className=''>
                 <h2 className="text-lg font-semibold border-b pb-1">Student Info :</h2>
                 <p><strong>Name:</strong> {currentId?.name}</p>
@@ -81,14 +84,14 @@ function PaymentDetails() {
                                 (p) => (p.checkpointType === (checkpoint.title || "Admission Fee")) || p.checkpointDueOrder === checkpoint.dueOrder
                             );
                             return (
-                                <tr key={index} >
+                                <tr key={index} className='text-center'>
                                     <td className="border border-gray-300 px-4 py-2">
                                         {paid ? format(paid.date.toDate(), "dd MMM yyyy") : "-"}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2">{checkpoint.title || "unknow"} </td>
                                     <td className="border border-gray-300 px-4 py-2">₹{checkpoint.amount}</td>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        <span className={`px-2 py-1 rounded text-xs font-semibold ${paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                    <td className="border border-gray-300 px-2 py-2">
+                                        <span className={`px-4 py-1 rounded text-xs font-semibold ${paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                             {paid ? 'Paid' : 'Pending'}
                                         </span>
                                     </td>
@@ -111,17 +114,17 @@ function PaymentDetails() {
                 </table>
             </div>
 
-          
             {nextDue && !payments.find(p => p.checkpointDueOrder === nextDue.dueOrder && p.status === "pending" && showForm == true) ? (
                 <div>
-                      <button
-                onClick={() => setShowForm(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded mt-4 cursor-pointer">Add New Payment</button>
+                    <button
+                        onClick={() => handleFormOpen()}
+                        className="bg-blue-500 text-white px-4 py-2 rounded mt-4 cursor-pointer">Add New Payment</button>
                     {showForm && (
-                        <div className="mt-4 p-4 border rounded bg-gray-100">
+                        <div 
+                       ref={formRef}
+                        className="mt-4 p-4 border rounded bg-gray-100">
                             <h2 className="font-bold mb-2">Add New Payment</h2>
                             <h2 className="font-bold">Next Payment: {nextDue.title} - ₹{nextDue.amount}</h2>
-
                             <input
                                 type="file"
                                 placeholder="upload Receipt"

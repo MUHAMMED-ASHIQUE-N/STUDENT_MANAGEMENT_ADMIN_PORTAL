@@ -20,10 +20,19 @@ function StudentForm({ editStudent, courses, onSaved }: StudentFormProps) {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState("");
 
-  const selectedCourse = courses.find((c) => c.id === courseId);
+  const selectedCourse = courses?.find((c) => c.id === courseId);
   const totalFee =
     (selectedCourse?.fees.courseFee || 0) + (selectedCourse?.fees.admissionFee || 0);
   const duration = selectedCourse?.duration || 0;
+
+    useEffect(() => {
+    if (courseId) {
+      const selectedCourse = courses.find((c) => c.id === courseId);
+      if (selectedCourse) {
+        setCheckpoint(selectedCourse.checkpoints || []);
+      }
+    }
+  }, [courseId, courses]);
 
   const handleCustomCheckpoint = (cpCount: number) => {
     if (!selectedCourse) return;
@@ -249,11 +258,6 @@ function StudentForm({ editStudent, courses, onSaved }: StudentFormProps) {
             </div>
           )}
 
-
-
-
-
-
           {/* Admission Fee */}
           <div>
             <label className="block mb-1 font-medium">Admission Fee</label>
@@ -292,3 +296,5 @@ function StudentForm({ editStudent, courses, onSaved }: StudentFormProps) {
 }
 
 export default StudentForm;
+
+

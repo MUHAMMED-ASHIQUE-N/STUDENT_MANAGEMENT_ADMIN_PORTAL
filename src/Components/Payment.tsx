@@ -33,14 +33,14 @@ const Payment = () => {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="md:p-6">
 
-    <div className="p-6  bg-white shadow rounded-lg overflow-auto">
+    <div className="p-6  bg-white shadow rounded-lg ">
+      <h2 className="text-2xl font-bold mb-4 md:text-center">Payment </h2>
       {location.pathname.endsWith("/payment") ? (
-        <div className="">
-          <h2 className="text-xl font-bold mb-4">Payment </h2>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-100">
+        <div className="overflow-auto">
+          <table className="w-full border-collapse border border-gray-300 ">
+            <thead className="bg-blue-50">
               <tr>
                 <th className="border border-gray-300 px-4 py-2">Student Name</th>
                 <th className="border border-gray-300 px-4 py-2">Course</th>
@@ -60,12 +60,12 @@ const Payment = () => {
                 const { totalFee, paidAmount, dueAmount } = calculateTotals(student, studentPayments);
                 const status = dueAmount === 0 ? "Paid" : "Partially Paid";
                 return (
-                  <tr key={student.id}>
+                  <tr key={student.id} className="text-blue-700 text-center ">
                     <td className="border border-gray-300 px-4 py-2">{student.name}</td>
                     <td className="border border-gray-300 px-4 py-2">{course?.title || 'unknow course'}</td>
                     <td className="border border-gray-300 px-4 py-2">₹{totalFee}</td>
-                    <td className="border border-gray-300 px-4 py-2">₹{paidAmount} </td>
-                    <td className="border border-gray-300 px-4 py-2">₹{dueAmount}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-green-600">₹{paidAmount} </td>
+                    <td className="border border-gray-300 px-4 py-2 text-red-600">₹{dueAmount}</td>
                     <td
                       className={`border border-gray-300 px-4 py-2 font-semibold ${status === "Paid" ? "text-green-600" : "text-yellow-600"
                         }`}

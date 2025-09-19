@@ -79,7 +79,6 @@ export interface Checkpoint {
 export const generateCheckpoints = (
   totalFee: number,
   admissionFee: number,
-  // cautionDeposit: number = 0,
   duration: number,
   customCheckpoints: Checkpoint[] = []
 ): Checkpoint[] => {

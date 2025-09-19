@@ -92,7 +92,7 @@ export type StudentDetails = {
 
 
 export interface Coursetype {
-    id: string;
+    id?: string;
     title: string;
     description: string;
     category: string;

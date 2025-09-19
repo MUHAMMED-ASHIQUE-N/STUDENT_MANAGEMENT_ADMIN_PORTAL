@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import type { Coursetype } from '../type/auth';
 
@@ -16,8 +11,8 @@ function CourseList({
   courses: Coursetype[] | undefined;
 }) {
   return (
-    <div className="max-w-6xl mx-auto md:px-4">
-      <h1 className="text-2xl font-bold my-6 text-center text-blue-700">Course Details</h1>
+    <div className="max-w-6xl mx- md:px-4">
+      <h1 className="text-3xl font-bold my-6 text-center ">Course Details</h1>
       
       {courses && courses.length > 0 ? (
         <div className="space-y-4">
@@ -71,7 +66,7 @@ function CourseList({
                   Edit
                 </button>
                 <button
-                  onClick={() => onDelete(data.id)}
+                  onClick={() => data?.id && onDelete(data.id)}
                   className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-md transition-colors"
                 >
                   Delete

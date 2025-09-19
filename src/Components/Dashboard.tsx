@@ -304,7 +304,7 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { DashContext } from '../context/DashContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const authContex = useContext(AuthContext);
@@ -324,7 +324,7 @@ function Dashboard() {
     revenueGraphData
   } = dashContext;
 
-
+  const navigate = useNavigate()
 
   return (
     <div className="flex flex-col min-h-screen md:p-6 overflow-hidden">
@@ -362,16 +362,16 @@ function Dashboard() {
             </div>
             <div className='flex gap-8'>
               <div>
-        <p className="text-sm text-gray-500">Total Revenue</p>
-              <h3 className="text-2xl font-bold text-gray-800">£{totalRevenue.toLocaleString()}</h3>
-             
+                <p className="text-sm text-gray-500">Total Revenue</p>
+                <h3 className="text-2xl font-bold text-gray-800">£{totalRevenue.toLocaleString()}</h3>
+
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Dues</p>
-              <h3 className="text-2xl font-bold text-gray-800">£{totalDues.toLocaleString()}</h3>
-           
+                <h3 className="text-2xl font-bold text-gray-800">£{totalDues.toLocaleString()}</h3>
+
               </div>
-                </div>
+            </div>
           </div>
           <div className="h-48 mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -430,15 +430,22 @@ function Dashboard() {
             <h4 className="text-lg font-semibold text-gray-700">Quick Actions</h4>
           </div>
           <div className="space-y-4">
-            <a href="#" className="flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">
+
+            <button
+              onClick={() => navigate("/institution/students")} // go to students page
+              className="w-full flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition cursor-pointer"
+            >
               <span className="font-medium">Add New Student</span>
               <BsPlusCircleFill size={20} />
-            </a>
-           
-            <a href="#" className="flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">
-              <span className="font-medium">Add New Course</span>
+            </button>
+            <button
+              onClick={() => navigate("/institution/courses")} // go to students page
+              className="w-full flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition cursor-pointer"
+            >
+              <span className="font-medium">Add New Courses</span>
               <BsPlusCircleFill size={20} />
-            </a>
+            </button>
+
             <a href="#" className="flex items-center justify-between px-4 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-200 shadow-md">
               <span className="font-medium">Pending Certificates</span>
               <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{pendingCertificates}</span>

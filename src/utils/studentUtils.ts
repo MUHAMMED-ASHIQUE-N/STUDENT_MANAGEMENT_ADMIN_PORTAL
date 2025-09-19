@@ -112,17 +112,15 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase/config";
 import {
-  addDoc,
   collection,
-  deleteDoc,
   doc,
   onSnapshot,
-  setDoc,
-  updateDoc,
   runTransaction,
   increment,
   Timestamp,
-  serverTimestamp,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import type { StudentDetails } from "../type/auth";
 import { generateCheckpoints } from "./generateCheckpoints ";
@@ -150,11 +148,11 @@ export const createStudent = async (
   );
 
   const studentRef = doc(db, "userDetails", uid);
-  const courseRef = doc(db, "courses", courseId); 
+  const courseRef = doc(db, "courses", courseId);
 
   try {
     await runTransaction(db, async (transaction) => {
-        const courseDoc = await transaction.get(courseRef);
+      const courseDoc = await transaction.get(courseRef);
       if (!courseDoc.exists()) {
         throw new Error("Course does not exist!");
       }
@@ -195,20 +193,20 @@ export const createStudent = async (
     });
 
     const studentData: StudentDetails = {
-  id: uid,
-  name,
-  email,
-  courseId,
-  admissionFee,
-  createdAt: Timestamp.now(),
-  checkpoints: checkpoint,
-};
+      id: uid,
+      name,
+      email,
+      courseId,
+      admissionFee,
+      createdAt: Timestamp.now(),
+      checkpoints: checkpoint,
+    };
 
-for (const cp of checkpoint) {
-  if (cp.title.toLocaleLowerCase() !== "admission fee") {
-    await addPendingPayment(db, studentData, cp);
-  }
-}
+    for (const cp of checkpoint) {
+      if (cp.title.toLocaleLowerCase() !== "admission fee") {
+        await addPendingPayment(db, studentData, cp);
+      }
+    }
 
     console.log("Student created and course count updated successfully!");
   } catch (e) {
@@ -217,13 +215,6 @@ for (const cp of checkpoint) {
     throw e;
   }
 };
-
-
-
-
-
-
-
 
 
 export const subscribeStudents = (callback: (students: StudentDetails[]) => void) => {
@@ -245,31 +236,98 @@ export const updateStudent = async (
   id: string,
   name: string,
   email: string,
-  courseId: string,
+  newCourseId: string,
   admissionFee: number,
   checkpoint: { title: string; amount: number, dueOrder: number }[],
   planType: string
 ) => {
   const studentRef = doc(db, "userDetails", id);
-  await updateDoc(studentRef, {
-    name,
-    email,
-    courseId,
-    admissionFee,
-    checkpointPlan: planType,
-    selectedCheckpoints: checkpoint
-  });
+  const newCourseRef = doc(db, "courses", newCourseId);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const studentDoc = await transaction.get(studentRef);
+      if (!studentDoc.exists()) {
+        throw new Error("student does not exist!");
+      }
+
+      const oldCourseId = studentDoc.data().courseId;
+      const oldCourseRef = doc(db, "courses", oldCourseId);
+
+
+      transaction.update(studentRef, {
+        name,
+        email,
+        courseId: newCourseId,
+        admissionFee,
+        checkpointPlan: planType,
+        selectedCheckpoints: checkpoint
+      })
+
+       if (oldCourseId !== newCourseId) {
+        transaction.update(oldCourseRef, {
+          studentsCount: increment(-1),
+        });
+
+        transaction.update(newCourseRef, {
+          studentsCount: increment(1),
+        });
+
+      }   
+    })
+   console.log(` Student ${name} updated successfully!`);
+  } catch (e) {
+    console.error(" Failed to update student:", e);
+    throw e;
+  }
+
+
 };
 
 
 export const deleteStudent = async (id: string, name: string, email: string, courseId: string) => {
-  await setDoc(doc(db, "previous", id), {
-    name,
-    email,
-    courseId,
-    status: "uncompleted",
-    movedAt: new Date(),
-  });
 
-  await deleteDoc(doc(db, "userDetails", id));
+  const studentRef = doc(db, "userDetails", id);
+  const courseRef = doc(db, "courses", courseId);
+  const previousRef = doc(db, "previous", id);
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const courseDoc = await transaction.get(courseRef);
+      if (!courseDoc.exists()) {
+        throw new Error("Course does not exist!");
+      }
+
+      transaction.set(previousRef, {
+        name,
+        email,
+        courseId,
+        status: "uncompleted",
+        movedAt: new Date(),
+      });
+
+      transaction.delete(studentRef);
+
+      transaction.update(courseRef, {
+        studentsCount: increment(-1),
+      });
+      
+      const paymentsQuery = query(
+        collection(db, "payments"),
+        where("studentId", "==", id),
+        where("status", "==", "pending") 
+      );
+
+      const paymentsSnap = await getDocs(paymentsQuery);
+      paymentsSnap.forEach((docSnap) => {
+        transaction.delete(docSnap.ref);
+      });
+    });
+
+    console.log(`✅ Student ${name} deleted, payments cleaned, and course count updated.`);
+  } catch (e) {
+    console.error("Failed to delete student: ", e);
+    throw e;
+  }
+
 };
