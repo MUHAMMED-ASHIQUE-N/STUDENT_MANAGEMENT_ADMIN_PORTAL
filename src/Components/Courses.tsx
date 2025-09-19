@@ -330,7 +330,7 @@ function Courses() {
       courseFee: 0,
       admissionFee: 0,
     },
-    checkpoints: [{ title: "", amount: 0, dueOrder: 0 }]
+    checkpoints: [{ title: "", amount: 0, dueOrder: 1 }]
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

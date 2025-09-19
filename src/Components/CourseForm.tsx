@@ -174,7 +174,7 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                     </div>
                 </div>
 
-                <p className="text-lg font-semibold">Total Fee: ₹{totalFee}</p>
+                {/* <p className="text-lg font-semibold">Total Fee: ₹{totalF}</p> */}
 
                 <div className="bg-gray-50 p-4 rounded-md">
                     <h3 className="font-bold mb-2">Payment Checkpoints</h3>
@@ -189,11 +189,12 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                             />
                             <input
                                 type="number"
-                                value={cp.amount}
-                                onChange={(e) => handleCheckpointChange(idx, "amount", Number(e.target.value))}
+                                value={cp.amount === 0 ? "" : cp.amount} // show placeholder if 0
+                                onChange={(e) => handleCheckpointChange(idx, "amount", e.target.value === "" ? 0 : Number(e.target.value))}
                                 placeholder="Amount"
                                 className="border border-gray-300 rounded-md py-2 px-3 w-full sm:w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+
                             <input
                                 type="number"
                                 value={cp.dueOrder}

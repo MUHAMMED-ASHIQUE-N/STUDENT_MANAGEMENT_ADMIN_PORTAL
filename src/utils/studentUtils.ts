@@ -264,7 +264,13 @@ export const updateStudent = async (
         selectedCheckpoints: checkpoint
       })
 
-       if (oldCourseId !== newCourseId) {
+      if (oldCourseId !== newCourseId) {
+        const oldCourseDoc = await transaction.get(oldCourseRef);
+        const oldCount = oldCourseDoc.data()?.studentsCount || 0;
+
+        transaction.update(oldCourseRef, {
+          studentsCount: Math.max(oldCount - 1, 0),
+        });
         transaction.update(oldCourseRef, {
           studentsCount: increment(-1),
         });
@@ -273,20 +279,17 @@ export const updateStudent = async (
           studentsCount: increment(1),
         });
 
-      }   
+      }
     })
-   console.log(` Student ${name} updated successfully!`);
+    console.log(` Student ${name} updated successfully!`);
   } catch (e) {
     console.error(" Failed to update student:", e);
     throw e;
   }
-
-
 };
 
 
 export const deleteStudent = async (id: string, name: string, email: string, courseId: string) => {
-
   const studentRef = doc(db, "userDetails", id);
   const courseRef = doc(db, "courses", courseId);
   const previousRef = doc(db, "previous", id);
@@ -309,13 +312,14 @@ export const deleteStudent = async (id: string, name: string, email: string, cou
       transaction.delete(studentRef);
 
       transaction.update(courseRef, {
-        studentsCount: increment(-1),
+        studentsCount: Math.max((courseDoc.data().studentsCount || 0) - 1, 0),
       });
-      
+
+
       const paymentsQuery = query(
         collection(db, "payments"),
         where("studentId", "==", id),
-        where("status", "==", "pending") 
+        where("status", "==", "pending")
       );
 
       const paymentsSnap = await getDocs(paymentsQuery);
