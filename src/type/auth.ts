@@ -1,4 +1,3 @@
-import type { Unsubscribe } from "firebase/auth";
 import type { Timestamp } from "firebase/firestore";
 
 export interface UserData {
@@ -38,42 +37,6 @@ export interface DashContextType {
     }[],
 }
 
-
-
-// export type StudentDetails = {
-//     id: string;
-//     name: string;
-//     email: string;
-//     courseId: string;
-//     admissionFee: number;
-//     advanceFee: number;
-//     createdAt?: Timestamp;
-//     course?: Coursetype;
-//     payment?: Payment[];
-//     selectedCheckpoints: {
-//         title: string;
-//         amount: number;
-//         dueOrder: number;
-//     }[];
-// };
-
-
-// export interface Coursetype {
-//     id: string;
-//     courseName: string;
-//     description: string;
-//     category: string;
-//     duration: number;
-//     courseFee: number;
-//     admissionFee: number;
-//     paymentCheckpoints: {
-//         title: string;
-//         amount: number;
-//         dueOrder: number;
-//     }[];
-// }
-
-
 export type StudentDetails = {
     id: string;
     name: string;
@@ -87,6 +50,7 @@ export type StudentDetails = {
         title: string;
         amount: number;
         dueOrder: number;
+        dueDate?: Timestamp;
     }[];
 };
 
@@ -105,6 +69,7 @@ export interface Coursetype {
         title: string;
         amount: number;
         dueOrder: number;
+        dueDate?: Timestamp;
     }[];
 
 

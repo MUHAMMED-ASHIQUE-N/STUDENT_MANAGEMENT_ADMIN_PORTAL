@@ -98,36 +98,36 @@
 
 
 
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-admin.initializeApp();
+// const functions = require("firebase-functions");
+// const admin = require("firebase-admin");
+// admin.initializeApp();
 
-const db = admin.firestore();
+// const db = admin.firestore();
 
-exports.updateStudentCountOnEnroll = functions.firestore
-  .document("enrollments/{enrollmentId}")
-  .onCreate(async (snap:any, context:any) => {
-    const data = snap.data();
-    const courseId = data.courseId;
+// exports.updateStudentCountOnEnroll = functions.firestore
+//   .document("enrollments/{enrollmentId}")
+//   .onCreate(async (snap:any, context:any) => {
+//     const data = snap.data();
+//     const courseId = data.courseId;
 
-    const courseRef = db.collection("courses").doc(courseId);
-    await courseRef.update({
-      studentCount: admin.firestore.FieldValue.increment(1)
-    });
+//     const courseRef = db.collection("courses").doc(courseId);
+//     await courseRef.update({
+//       studentCount: admin.firestore.FieldValue.increment(1)
+//     });
 
-    console.log(`Student count incremented for course ${courseId}`);
-  });
+//     console.log(`Student count incremented for course ${courseId}`);
+//   });
 
-exports.updateStudentCountOnUnenroll = functions.firestore
-  .document("enrollments/{enrollmentId}")
-  .onDelete(async (snap:any, context:any) => {
-    const data = snap.data();
-    const courseId = data.courseId;
+// exports.updateStudentCountOnUnenroll = functions.firestore
+//   .document("enrollments/{enrollmentId}")
+//   .onDelete(async (snap:any, context:any) => {
+//     const data = snap.data();
+//     const courseId = data.courseId;
 
-    const courseRef = db.collection("courses").doc(courseId);
-    await courseRef.update({
-      studentCount: admin.firestore.FieldValue.increment(-1)
-    });
+//     const courseRef = db.collection("courses").doc(courseId);
+//     await courseRef.update({
+//       studentCount: admin.firestore.FieldValue.increment(-1)
+//     });
 
-    console.log(`Student count decremented for course ${courseId}`);
-  });
+//     console.log(`Student count decremented for course ${courseId}`);
+//   });

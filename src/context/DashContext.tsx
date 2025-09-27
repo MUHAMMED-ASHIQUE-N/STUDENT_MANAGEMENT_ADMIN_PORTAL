@@ -1,5 +1,5 @@
 import { collection, onSnapshot } from "firebase/firestore";
-import React, { createContext, useEffect, useState, type ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { db } from "../firebase/config";
 import { format } from "date-fns";
 import type { DashContextType } from "../type/auth";
@@ -110,3 +110,8 @@ export const DashProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     )
 }
 
+export const useDash = () => {
+  const context = useContext(DashContext);
+  if (!context) throw new Error("AuthContext not found");
+  return context;
+};

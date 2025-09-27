@@ -123,11 +123,11 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                     </div>
 
                     <div className="flex flex-col">
-                        <label className="mb-1 font-medium">Course Duration (Months)</label>
+                        <label className="mb-1 font-medium">Course Duration</label>
                         <input
                             type="number"
                             name="duration"
-                            value={course.duration}
+                            value={course.duration === 0 ? "" : course.duration}
                             onChange={handleChange}
                             placeholder="Duration in months"
                             required
@@ -140,7 +140,7 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                         <input
                             type="number"
                             name="courseFee"
-                            value={course.fees.courseFee}
+                            value={course.fees.courseFee === 0 ? "" : course.fees.courseFee}
                             onChange={handleFeeChange}
                             placeholder="Course Fee"
                             required
@@ -153,7 +153,7 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                         <input
                             type="number"
                             name="admissionFee"
-                            value={course.fees.admissionFee}
+                            value={course.fees.admissionFee === 0 ? "" : course.fees.admissionFee}
                             onChange={handleFeeChange}
                             placeholder="Admission Fee"
                             required
@@ -173,9 +173,6 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                         />
                     </div>
                 </div>
-
-                {/* <p className="text-lg font-semibold">Total Fee: ₹{totalF}</p> */}
-
                 <div className="bg-gray-50 p-4 rounded-md">
                     <h3 className="font-bold mb-2">Payment Checkpoints</h3>
                     {course.checkpoints.map((cp, idx) => (
@@ -189,7 +186,7 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                             />
                             <input
                                 type="number"
-                                value={cp.amount === 0 ? "" : cp.amount} // show placeholder if 0
+                                value={cp.amount === 0 ? "" : cp.amount} 
                                 onChange={(e) => handleCheckpointChange(idx, "amount", e.target.value === "" ? 0 : Number(e.target.value))}
                                 placeholder="Amount"
                                 className="border border-gray-300 rounded-md py-2 px-3 w-full sm:w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -219,14 +216,12 @@ function CourseForm({ editId, setEditId, course, setCourse, error, setError, loa
                         + Add Checkpoint
                     </button>
                 </div>
-
                 <button
                     type="submit"
                     className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 transition-colors font-semibold"
                 >
                     {loading ? "Saving..." : editId ? "Update Course" : "Create Course"}
                 </button>
-
                 {error && <p className="text-red-500 text-center">{error}</p>}
             </form>
         </div>

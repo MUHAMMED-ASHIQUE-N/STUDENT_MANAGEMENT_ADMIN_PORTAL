@@ -15,7 +15,7 @@ function PaymentDetails() {
     const [showForm, setShowForm] = useState(false);
     const [receiptUrl, setReceiptUrl] = useState<string | null>("");
 
-  const formRef = useRef<HTMLDivElement>(null);
+    const formRef = useRef<HTMLDivElement>(null);
 
     const currentId = students.find((s) => s.id === id)
     const course = courses.find((c) => c.id === currentId?.courseId)
@@ -69,7 +69,7 @@ function PaymentDetails() {
             </div>
             <div className='overflow-auto mt-4'>
                 <table className="w-full border-collapse border border-gray-300">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-blue-50">
                         <tr>
                             <th className="border border-gray-300 px-4 py-2">Date</th>
                             <th className="border border-gray-300 px-4 py-2">checkpoint</th>
@@ -84,9 +84,12 @@ function PaymentDetails() {
                                 (p) => (p.checkpointType === (checkpoint.title || "Admission Fee")) || p.checkpointDueOrder === checkpoint.dueOrder
                             );
                             return (
-                                <tr key={index} className='text-center'>
-                                    <td className="border border-gray-300 px-4 py-2">
-                                        {paid ? format(paid.date.toDate(), "dd MMM yyyy") : "-"}
+                                <tr key={index} className='text-center nth-[even]:bg-blue-50  text-gray-700'>
+                                    <td className={`border border-gray-300 px-4 py-2 ${paid ? "font-medium" : "text-gray-400 font-normal"}`}>
+                                        {paid ? format(paid.date.toDate(), "dd MMM yyyy")
+                                            : checkpoint.dueDate && typeof checkpoint.dueDate.toDate === "function"
+                                                ? format(checkpoint.dueDate.toDate(), "dd MMM yyyy")
+                                                : "-"}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2">{checkpoint.title || "unknow"} </td>
                                     <td className="border border-gray-300 px-4 py-2">₹{checkpoint.amount}</td>
@@ -120,9 +123,9 @@ function PaymentDetails() {
                         onClick={() => handleFormOpen()}
                         className="bg-blue-500 text-white px-4 py-2 rounded mt-4 cursor-pointer">Add New Payment</button>
                     {showForm && (
-                        <div 
-                       ref={formRef}
-                        className="mt-4 p-4 border rounded bg-gray-100">
+                        <div
+                            ref={formRef}
+                            className="mt-4 p-4 border rounded bg-blue-50">
                             <h2 className="font-bold mb-2">Add New Payment</h2>
                             <h2 className="font-bold">Next Payment: {nextDue.title} - ₹{nextDue.amount}</h2>
                             <input

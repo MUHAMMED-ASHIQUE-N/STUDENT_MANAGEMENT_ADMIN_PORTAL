@@ -3,7 +3,6 @@ import {
   collection,
   doc,
   onSnapshot,
-  runTransaction,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -31,9 +30,6 @@ export const createCourse = async (
       createdAt: serverTimestamp(),
     });
   };
-
-
-
 
 export const subscribeCourse = (
   callback: (courses: Coursetype[]) => void

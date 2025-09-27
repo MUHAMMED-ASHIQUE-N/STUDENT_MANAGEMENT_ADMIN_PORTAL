@@ -11,9 +11,7 @@ function CourseList({
   courses: Coursetype[] | undefined;
 }) {
   return (
-    <div className="max-w-6xl mx- md:px-4">
-      <h1 className="text-3xl font-bold my-6 text-center ">Course Details</h1>
-      
+    <div className="">
       {courses && courses.length > 0 ? (
         <div className="space-y-4">
           {courses.map((data) => (
@@ -21,14 +19,12 @@ function CourseList({
               key={data.id}
               className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
-              {/* Basic Info */}
               <div className="mb-4">
                 <h2 className="text-xl font-semibold text-gray-800 uppercase">{data.title}</h2>
                 <p className="text-gray-600 mt-1">{data.description}</p>
                 <p className=" text-blue-600 mt-2 capitalize">Category: {data.category}</p>
               </div>
 
-              {/* Fees & Duration */}
               <div className="grid grid-cols-1 sm:grid-cols- gap-1 mb-4">
                 <div>
                   <span className="font-medium">Duration:</span> {data.duration} months
@@ -41,7 +37,6 @@ function CourseList({
                 </div>
               </div>
 
-              {/* Payment Checkpoints */}
               <div className="mb-4">
                 <h3 className="font-semibold mb-2">Payment Checkpoints:</h3>
                 {data.checkpoints && data.checkpoints.length > 0 ? (
@@ -57,7 +52,6 @@ function CourseList({
                 )}
               </div>
 
-              {/* Actions */}
               <div className="flex gap-3">
                 <button
                   onClick={() => onEdit(data)}
