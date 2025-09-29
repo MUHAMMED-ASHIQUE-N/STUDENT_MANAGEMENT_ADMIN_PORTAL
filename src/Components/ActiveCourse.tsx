@@ -7,12 +7,12 @@ function ActiveCourse() {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-purple-100 rounded-full">
+                <div className="p-2 md:p-3 bg-purple-100 rounded-full">
                     <BsBookHalf size={24} className="text-purple-500" />
                 </div>
                 <div>
                     <p className="text-sm text-gray-500">Active Courses</p>
-                    <h3 className="text-3xl font-bold text-gray-800">{activeCourses}</h3>
+                    <h3 className="text-xl sm:text-3xl font-bold text-gray-800">{activeCourses}</h3>
                 </div>
             </div>
             <div className="mt-4">

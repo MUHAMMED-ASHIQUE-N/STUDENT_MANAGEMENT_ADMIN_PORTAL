@@ -9,7 +9,7 @@ function QuikActions() {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center space-x-4 mb-4">
-                <div className="p-3 bg-yellow-100 rounded-full">
+                <div className="p-2 md:p-3 bg-yellow-100 rounded-full">
                     <BsLightningFill size={24} className="text-yellow-500" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-700">Quick Actions</h4>

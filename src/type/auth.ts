@@ -27,11 +27,19 @@ export interface DashContextType {
         title: string;
         students: number;
     }[];
-    studentGraphData: {
+    studentGraphDataMonthly: {
         name: string | number;
         students: string | number;
     }[];
-    revenueGraphData: {
+    studentGraphDataDaily: {
+        name: string | number;
+        students: string | number;
+    }[];
+    revenueGraphDataMonthly: {
+        name: string | number;
+        totalRevenue: string | number;
+    }[],
+    revenueGraphDataDaily: {
         name: string | number;
         totalRevenue: string | number;
     }[],
