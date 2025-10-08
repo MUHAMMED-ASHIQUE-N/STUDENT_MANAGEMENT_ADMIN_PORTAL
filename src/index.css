@@ -1,1 +1,149 @@
 @import "tailwindcss";
+
+.page {
+  min-height: 100vh;
+  background-color: white;
+  padding: 32px;
+}
+.container {
+  border: 2px solid #1f2937;
+  border-radius: 8px;
+  padding: 48px;
+  max-width: 896px;
+  margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.headerBorder {
+  border-bottom: 2px solid #1f2937;
+  padding-bottom: 16px;
+  margin-bottom: 32px;
+}
+.mainTitle {
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.subTitle {
+  font-size: 18px;
+  font-weight: 300;
+}
+.recipientSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.recipientName {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.courseSection {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.courseText {
+  font-size: 20px;
+  margin-bottom: 24px;
+  line-height: 1.75;
+  max-width: 768px;
+  margin: 0 auto 24px auto;
+}
+.courseName {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #d1d5db;
+  padding-bottom: 16px;
+  display: inline-block;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+.description {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.descriptionText {
+  font-size: 18px;
+  line-height: 1.75;
+  max-width: 768px;
+  margin: 0 auto;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid #1f2937;
+}
+.signature {
+  text-align: center;
+  flex: 1;
+}
+.signatureLine {
+  border-top: 2px solid #1f2937;
+  padding-top: 8px;
+  width: 192px;
+  margin: 0 auto 8px auto;
+}
+.signatureName {
+  font-weight: 600;
+  font-size: 18px;
+}
+.signatureTitle {
+  font-size: 14px;
+}
+.dateSection {
+  text-align: center;
+  flex: 1;
+}
+.dateLabel {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.dateValue {
+  font-size: 18px;
+}
+.securityNote {
+  text-align: center;
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid #d1d5db;
+}
+.securityText {
+  font-size: 14px;
+  color: #6b7280;
+}
+.uploadButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+.button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.buttonHover {
+  background-color: #1d4ed8;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}

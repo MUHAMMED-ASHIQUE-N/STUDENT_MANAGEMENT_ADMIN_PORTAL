@@ -59,6 +59,7 @@ const Payment = () => {
                     const studentPayments = payments.filter((p) => p.studentId === student.id);
                     const { totalFee, paidAmount, dueAmount } = calculateTotals(student, studentPayments);
                     const status = dueAmount === 0 ? "Paid" : "Partially Paid";
+                    if(student.role === 'student')
                     return (
                       <tr key={student.id} className="text-blue-700 text-center nth-[even]:bg-blue-50">
                         <td className="border border-gray-300 px-4 py-2">{student.name}</td>

@@ -1,8 +1,12 @@
 import React from 'react'
+import ModernCertificate from './CertificateTemplate'
 
 function Certificates() {
   return (
-    <div>Certificates</div>
+    <div>
+      
+      <ModernCertificate/>
+    </div>
   )
 }
 

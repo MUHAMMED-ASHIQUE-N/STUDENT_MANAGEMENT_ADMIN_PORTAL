@@ -60,6 +60,7 @@ export type StudentDetails = {
         dueOrder: number;
         dueDate?: Timestamp;
     }[];
+    role?:'student';
 };
 
 

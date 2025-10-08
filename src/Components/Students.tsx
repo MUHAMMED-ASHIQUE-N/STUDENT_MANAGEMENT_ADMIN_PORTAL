@@ -40,7 +40,6 @@ function Students() {
     const search = searchTerm.toLowerCase();
     if ( student.role === "student") {
       return (
-      
       student.name?.toLowerCase().includes(search) ||
       student.id.toLowerCase().includes(search) ||
       courseTitle.includes(search)

@@ -5,6 +5,10 @@ import { useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { subscribeStudents, subscribeCourses, subscribePayments, addPayment, calculateTotals } from '../utils/paymentUtils'
 import { getNextDueCheckpoint } from '../utils/paymentUtils'
+import { generateAndUploadReceipt } from '../utils/generateAndUploadReceipt '
+import ReceiptTemplate from './ReceiptTemplate'
+import CertificateTemplate from './CertificateTemplate'
+import ProgressTracker from './ProgressTracker'
 
 function PaymentDetails() {
     const { id } = useParams()
@@ -14,6 +18,44 @@ function PaymentDetails() {
     const [payments, setPayments] = useState<any[]>([])
     const [showForm, setShowForm] = useState(false);
     const [receiptUrl, setReceiptUrl] = useState<string | null>("");
+    const [selectedPayment, setSelectedPayment] = useState(null);
+
+    const [showCertificateModal, setShowCertificateModal] = useState(false);
+    const [certificateStudent, setCertificateStudent] = useState<StudentDetails | null>(null);
+    const [certificateCourse, setCertificateCourse] = useState<Coursetype | null>(null);
+    const [certificateIssued, setCertificateIssued] = useState(false);
+    // Progress tracking states
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+
+    const handleGenerateReceipt = async (payment: any) => {
+        if (!payment) {
+            alert("No payment found for this checkpoint!");
+            return;
+        }
+
+        setSelectedPayment(payment);
+        setIsGenerating(true);
+        setUploadProgress(0);
+
+        // Wait for DOM to render the receipt
+        setTimeout(async () => {
+            try {
+                await generateAndUploadReceipt(payment, (progress) => {
+                    setUploadProgress(progress);
+                });
+                alert("✅ Receipt generated successfully!");
+            } catch (error) {
+                console.error("Receipt generation failed:", error);
+            } finally {
+                setIsGenerating(false);
+                setSelectedPayment(null);
+                setUploadProgress(0);
+            }
+        }, 100);
+    };
+
+
 
     const formRef = useRef<HTMLDivElement>(null);
 
@@ -54,8 +96,20 @@ function PaymentDetails() {
         formRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
+    const handleIssuCertificate = () => {
+        if (!currentId || !course) {
+            alert("No student or course found!");
+            return;
+        }
+        setCertificateStudent(currentId);
+        setCertificateCourse(course);
+        setShowCertificateModal(true);
+    };
+
+
     return (
         <div className=''>
+            <ProgressTracker isGenerating={isGenerating} uploadProgress={uploadProgress} />
             <h1 className='md:text-center text-xl font-bold'> Payment History  </h1>
             <div className=''>
                 <h2 className="text-lg font-semibold border-b pb-1">Student Info :</h2>
@@ -100,15 +154,29 @@ function PaymentDetails() {
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2 text-blue-600 underline">
 
-                                        {/* {paid.receiptUrl? (
-                                            
-                                            <a href={paid.receiptUrl} target="_blank" rel="noopener noreferrer">
-                                                View
-                                            </a>
-                                        ) :
-                                         (<p>upload</p>)} */}
+                                        {paid?.receiptUrl ? (
+                                            <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
+                                                <a href={paid.receiptUrl} target="_blank" rel="noopener noreferrer">
+                                                    View
+                                                </a>
+                                                <a
+                                                    href={paid.receiptUrl}
+                                                    download={`receipt_${currentId?.name}_${checkpoint.title}.pdf`}
+                                                    className="text-blue-500 underline"
+                                                >
+                                                    Download
+                                                </a>
+                                            </div>
 
-                                        upload
+                                        ) :
+                                            (
+                                                <button
+                                                    onClick={() => handleGenerateReceipt(paid)}
+                                                    disabled={isGenerating}>
+
+                                                    {isGenerating ? "Generating..." : "Generate Receipt"}
+                                                </button>
+                                            )}
                                     </td>
                                 </tr>
                             )
@@ -128,19 +196,6 @@ function PaymentDetails() {
                             className="mt-4 p-4 border rounded bg-blue-50">
                             <h2 className="font-bold mb-2">Add New Payment</h2>
                             <h2 className="font-bold">Next Payment: {nextDue.title} - ₹{nextDue.amount}</h2>
-                            <input
-                                type="file"
-                                placeholder="upload Receipt"
-                                accept="image/*,.pdf"
-                                onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                        setReceiptUrl(e.target.files[0].name); // just store file name for now
-                                    } else {
-                                        setReceiptUrl(null);
-                                    }
-                                }}
-                                className="border p-2 w-full mb-2"
-                            />
                             <button
                                 onClick={handleAddPayment}
                                 className="bg-blue-500 text-white px-4 py-2 rounded">
@@ -153,18 +208,61 @@ function PaymentDetails() {
                             </button>
                         </div>
                     )}
-
                 </div>
             ) : (
-                <p className="text-green-600 mt-4">All checkpoints completed 🎉</p>
+                <div>
+                    {!nextDue && !certificateIssued ? (
+                        <button
+                            onClick={handleIssuCertificate}
+                            className="bg-green-600 text-white rounded-md m-4 p-2"
+                        >
+                            🎉 Issue Certificate
+                        </button>
+                    ) : !nextDue && certificateIssued ? (
+                        <button
+                            disabled
+                            className="bg-gray-400 text-white rounded-md m-4 p-2 cursor-not-allowed"
+                        >
+                            Certificate Already Issued
+                        </button>
+                    ) : null}
+                </div>
+
+                // <button
+                // onClick={ handleIssuCertificate}
+                //  className="bg-green-600 text-white rounded-md m-4 p-2">issue certificate </button>
 
             )}
+
+            {showCertificateModal && certificateStudent && certificateCourse && (
+                <div className="mt-">
+                    <div className="bg-white rounded-xl shadow-xl p-6 w-full relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                            onClick={() => setShowCertificateModal(false)}
+                        >
+                            &times;
+                        </button>
+                        <CertificateTemplate
+                            student={certificateStudent}
+                            course={certificateCourse.title}
+                            onUploaded={() => {
+                                setShowCertificateModal(false);
+                                setCertificateIssued(true);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+            {selectedPayment && (
+                <div style={{ position: "absolute", left: "-9999px", top: 0, zIndex: -1 }}>
+                    <ReceiptTemplate student={currentId} payment={selectedPayment} course={course} />
+                </div>
+            )}
         </div>
-
-
-
     )
 }
 
 export default PaymentDetails
+
 
