@@ -64,7 +64,7 @@ export const generateAndUploadReceipt = async (
       }
     );
 
-    onProgress?.(100);
+    onProgress?.(98);
 
     const receiptUrl = res.data.secure_url;
     if (!receiptUrl) throw new Error("Cloudinary upload failed");

@@ -8,8 +8,8 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
   const courseName = (student?.courseId === course?.id) ? course?.title : "undkon"
   console.log(courseName);
   console.log(course?.title);
-  
-  
+
+
   return (
     <div
       id="receipt"
@@ -24,7 +24,6 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
         position: "relative",
       }}
     >
-      {/* Watermark */}
       <div
         style={{
           position: "absolute",
@@ -82,12 +81,12 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
           </p>
           <p>
             <strong>Date:</strong>{" "}
-           {payment?.date? format(payment.date.toDate(), "dd MMM yyyy"): 'Invalid Date'}
+            {payment?.date ? format(payment.date.toDate(), "dd MMM yyyy") : 'Invalid Date'}
           </p>
         </div>
         <div>
           <p>
-            <strong>Student ID:</strong> {student?.id}
+            <strong>Student ID:</strong> {student?.studentSeqId}
           </p>
           <p>
             <strong>Payment Status:</strong> {payment?.status}
@@ -119,7 +118,7 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
               <strong>Course</strong>
             </td>
             <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-             {courseName}
+              {courseName}
             </td>
           </tr>
           <tr>
@@ -158,15 +157,23 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
           position: "relative",
         }}
       >
-        <div>
+        <div className="relative">
           <p>Authorized Signature:</p>
+            <img
+              src={signature}
+              alt="Signature"
+              style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
+              className="absolute"
+            />
           <div
             style={{
               width: "200px",
               height: "50px",
               borderBottom: "1px solid #000",
+              marginTop:"20px"
             }}
-          ></div>
+          >
+          </div>
         </div>
         <div style={{ textAlign: "right" }}>
           <p style={{ fontStyle: "italic" }}>Thank you for your payment!</p>

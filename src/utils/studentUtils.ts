@@ -15,6 +15,9 @@ import type { StudentDetails } from "../type/auth";
 import { generateCheckpoints } from "./generateCheckpoints ";
 import { addPendingPayment } from "./paymentUtils";
 
+const counterRef = doc(db, "counters", "students");
+
+
 export const createStudent = async (
   name: string,
   email: string,
@@ -25,6 +28,7 @@ export const createStudent = async (
   planType: string,
   totalFee: number,
   duration: number,
+  profilePicUrl?: string ,
 ) => {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const uid = userCredential.user.uid;
@@ -42,7 +46,20 @@ export const createStudent = async (
 
   try {
     await runTransaction(db, async (transaction) => {
+
+      const counterDoc = await transaction.get(counterRef);
       const courseDoc = await transaction.get(courseRef);
+
+      let lastSeq = 0;
+      if (counterDoc.exists()) {
+        lastSeq = counterDoc.data().lastSeq || 0;
+      }
+      const newSeq = lastSeq + 1;
+      const studentSeqId = `STD${String(newSeq).padStart(2, "0")}`;
+
+      transaction.set(counterRef, { lastSeq: newSeq }, { merge: true });
+
+
       if (!courseDoc.exists()) {
         throw new Error("Course does not exist!");
       }
@@ -56,6 +73,8 @@ export const createStudent = async (
         checkpointPlan: planType,
         checkpoints: checkpoint,
         role: "student",
+        studentSeqId,
+        profilePicUrl:profilePicUrl || "",
       });
 
       transaction.update(courseRef, {
@@ -125,7 +144,8 @@ export const updateStudent = async (
   newCourseId: string,
   admissionFee: number,
   checkpoint: { title: string; amount: number, dueOrder: number }[],
-  planType: string
+  planType: string,
+  profilePicUrl?: string 
 ) => {
   const studentRef = doc(db, "userDetails", id);
   const newCourseRef = doc(db, "courses", newCourseId);
@@ -147,7 +167,8 @@ export const updateStudent = async (
         courseId: newCourseId,
         admissionFee,
         checkpointPlan: planType,
-        selectedCheckpoints: checkpoint
+        selectedCheckpoints: checkpoint,
+        profilePicUrl 
       })
 
       if (oldCourseId !== newCourseId) {

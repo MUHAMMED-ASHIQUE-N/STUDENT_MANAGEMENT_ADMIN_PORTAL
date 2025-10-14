@@ -47,6 +47,7 @@ export interface DashContextType {
 
 export type StudentDetails = {
     id: string;
+    studentSeqId?:string;
     name: string;
     email: string;
     courseId: string;
@@ -61,6 +62,7 @@ export type StudentDetails = {
         dueDate?: Timestamp;
     }[];
     role?:'student';
+    profilePicUrl?:string;
 };
 
 
@@ -87,7 +89,6 @@ export interface Coursetype {
 
 
 export interface Payment {
-    // id: string;
     studentId: string;
     courseId: string;
     title: string;

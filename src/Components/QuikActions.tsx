@@ -1,41 +1,44 @@
-import React from 'react'
-import { BsLightningFill, BsPlusCircleFill } from 'react-icons/bs'
-import { useDash } from '../context/DashContext'
+import React from 'react';
+import { Plus } from 'lucide-react';
+import { useDash } from '../context/DashContext';
 import { useNavigate } from 'react-router-dom';
 
-function QuikActions() {
-    const { pendingCertificates } = useDash();
+function QuickActions() {
+        const { pendingCertificates } = useDash();
     const navigate = useNavigate()
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center space-x-4 mb-4">
-                <div className="p-2 md:p-3 bg-yellow-100 rounded-full">
-                    <BsLightningFill size={24} className="text-yellow-500" />
-                </div>
-                <h4 className="text-lg font-semibold text-gray-700">Quick Actions</h4>
-            </div>
-            <div className="space-y-4">
-                <button
-                    onClick={() => navigate("/institution/students")} // go to students page
-                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition cursor-pointer"
-                >
-                    <span className="font-medium">Add New Student</span>
-                    <BsPlusCircleFill size={20} />
-                </button>
-                <button
-                    onClick={() => navigate("/institution/courses")} // go to students page
-                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition cursor-pointer"
-                >
-                    <span className="font-medium">Add New Courses</span>
-                    <BsPlusCircleFill size={20} />
-                </button>
-                <a href="#" className="flex items-center justify-between px-4 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-200 shadow-md">
-                    <span className="font-medium">Pending Certificates</span>
-                    <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">{pendingCertificates}</span>
-                </a>
-            </div>
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-gray-900">Quick Actions</h2>
+        <p className="text-sm text-gray-500 mt-1">Common tasks</p>
+      </div>
+      <div className="space-y-3">
+        <button
+          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium"
+             onClick={() => navigate("/institution/students")}        >
+          <span>Add Student</span>
+          <Plus size={18} />
+        </button>
+        <button
+          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-lg hover:shadow-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 font-medium"
+            onClick={() => navigate("/institution/courses")}        >
+          <span>Add Course</span>
+          <Plus size={18} />
+        </button>
+        <div className="pt-3 border-t border-gray-200">
+          <button
+            className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-900 rounded-lg border border-amber-200 hover:bg-amber-100 transition-all duration-300 font-medium"
+            // onClick={onCertificatesClick}
+          >
+            <span>Certificates</span>
+            <span className="text-sm font-bold bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">
+              {pendingCertificates}
+            </span>
+          </button>
         </div>
-    )
+      </div>
+    </div>
+  );
 }
 
-export default QuikActions
+export default QuickActions;

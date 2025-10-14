@@ -5,6 +5,7 @@ import { subscribeStudents } from "../utils/studentUtils";
 import type { Coursetype } from "../type/auth";
 import StudentList from "./StudentList";
 import StudentForm from "./StudentForm";
+import { BsChevronDown, BsPlus, BsSearch, BsX } from "react-icons/bs";
 
 function Students() {
   const [courses, setCourses] = useState<Coursetype[]>([]);
@@ -12,6 +13,7 @@ function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editStudent, setEditStudent] = useState<any | null>(null);
+  const [sortOption, setSortOption] = useState<'createdDesc' | 'createdAsc' | 'nameAsc' | 'nameDesc'>('createdDesc');
 
   const formRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -34,19 +36,35 @@ function Students() {
     return () => unsubscribe();
   }, []);
 
-  const filteredStudents = students.filter((student) => {
-    const course = courses.find((c) => c.id === student.courseId);
-    const courseTitle = course ? course.title.toLowerCase() : "";
-    const search = searchTerm.toLowerCase();
-    if ( student.role === "student") {
-      return (
-      student.name?.toLowerCase().includes(search) ||
-      student.id.toLowerCase().includes(search) ||
-      courseTitle.includes(search)
-    );
-    }
-    
-  });
+
+  const filteredStudents = students
+    .filter((student) => {
+      const course = courses.find((c) => c.id === student.courseId);
+      const courseTitle = course ? course.title.toLowerCase() : "";
+      const search = searchTerm.toLowerCase();
+      if (student.role === "student") {
+        return (
+          student.name?.toLowerCase().includes(search) ||
+          student.id.toLowerCase().includes(search) ||
+          courseTitle.includes(search)
+        );
+      }
+      return false;
+    })
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "createdAsc":
+          return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+        case "createdDesc":
+          return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+        case "nameAsc":
+          return a.name.localeCompare(b.name);
+        case "nameDesc":
+          return b.name.localeCompare(a.name);
+        default:
+          return 0;
+      }
+    });
 
   const handleEdit = (student: any) => {
     setEditStudent(student);
@@ -61,47 +79,82 @@ function Students() {
 
   return (
     <div className="sm:p-2">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
-        <div className="w-full sm:w-1/3 px-4 py-2 rounded-md flex justify-between relative bg-white shadow-md">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder=" Search students..."
-            className="w-full outline-none pl-6 text-gray-500"
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-2 border border-slate-200">
+            <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-lg border border-slate-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition">
+              <BsSearch size={20} className="text-slate-400 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or student ID..."
+                className="flex-1 bg-transparent outline-none text-slate-700 placeholder-slate-400"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <BsX size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() =>
+                formOpen ? handleFormClose() : setFormOpen(true)
+              }
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border ${
+                formOpen
+                  ? "bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                  : "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {formOpen ? <BsX size={20} /> : <BsPlus size={20} />}
+              <span>
+                {formOpen ? "Cancel" : "Create New Student"}
+              </span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => (formOpen ? handleFormClose() : setFormOpen(true))}
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          {formOpen ? "Cancel" : "+ Create New Student"}
-        </button>
-      </div>
+
+        <div className=" flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-slate-700">
+              Sort by:
+            </label>
+            <div className="relative">
+              <select
+                value={sortOption}
+                onChange={e => setSortOption(e.target.value as typeof sortOption)}
+
+                className="appearance-none px-4 py-2 pr-10 border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:border-slate-300 transition"
+              >
+                <option value="createdDesc">
+                  Newest First
+                </option>
+                <option value="createdAsc">Oldest First</option>
+                <option value="nameAsc">Name (A-Z)</option>
+                <option value="nameDesc">Name (Z-A)</option>
+              </select>
+              <BsChevronDown
+                size={16}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+            </div>
+          </div>
+        </div>
       <div
         ref={formRef}
-        className={`text-xs lg:text-sm bg-white border-t-6 rounded-2xl border-blue-500 shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
+        className={` mt-2  overflow-hidden transition-all duration-300 ease-in-out ${
           formOpen ? "opacity-100 p-2 md:p-6" : "max-h-0 opacity-0 p-0"
-        }`}
+        }`
+      }
       > 
         {formOpen && (
           <>
-            <h2 className="text-center text-2xl font-bold mb-6 text-blue-600">
-              {editStudent ? "Edit Student" : "Create New Student"}
-            </h2>
             <StudentForm
               editStudent={editStudent}
               courses={courses}
@@ -116,3 +169,8 @@ function Students() {
 }
 
 export default Students;
+
+
+
+
+

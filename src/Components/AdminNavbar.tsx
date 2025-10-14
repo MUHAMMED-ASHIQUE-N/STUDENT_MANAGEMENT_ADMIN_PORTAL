@@ -3,7 +3,7 @@ import React from 'react'
 function AdminNavbar() {
   return (
     <div>
-        <nav className='bg-blue-800 h-18 flex items-center justify-between px-24 text-white'>
+        <nav className='bg-gradient-to-r from-blue-600 to-indigo-700  h-18 flex items-center justify-between px-24 text-white'>
             <h1>Logo</h1>
         </nav>
     </div>
