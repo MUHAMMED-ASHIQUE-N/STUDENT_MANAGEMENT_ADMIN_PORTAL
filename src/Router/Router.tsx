@@ -23,7 +23,8 @@ function Router() {
             <Route path='/institution' element={
                 <ProtectedRoute >
                     <Home />
-                </ProtectedRoute>}
+                </ProtectedRoute>
+                }
 
                 >
                 <Route path='dashboard' element={<Dashboard />} />

@@ -17,7 +17,6 @@ export const generateCheckpoints = (
   let checkpoints: Checkpoint[] = [];
   let order = 0;
   let remainingFee = totalFee;
-    console.log(remainingFee,'remening fee first totalfee amount in generate checkpoint');
 
 
   const validCustom = customCheckpoints.filter(
@@ -37,7 +36,6 @@ export const generateCheckpoints = (
       dueDate: startDate,
     });
     remainingFee -= admissionFee;
-      console.log(remainingFee,'remening amount after minus admission in generate checkpoint');
 
   }
 
@@ -56,25 +54,15 @@ export const generateCheckpoints = (
 
   const installmentCount = Number(duration);
   if (installmentCount > 0 && remainingFee > 0) {
-    const baseAmount = Math.floor(remainingFee / installmentCount);
-    console.log(baseAmount, 'base amount in //////');
-    
+    const baseAmount = Math.floor(remainingFee / installmentCount);    
     const remainder = remainingFee % installmentCount;
-  console.log(remainder,'remening amount in generate checkpoint');
-  console.log(installmentCount, 'installment count');
-  
 
     for (let i = 1; i <= installmentCount; i++) {
-      let amount = baseAmount;
-      console.log(amount, 'amount before if loop');
-      
+      let amount = baseAmount;      
       if (i === installmentCount) {
-        amount = Number(amount) + Number(remainder);
-        console.log(amount,'amount in get with reminder in for loop i== installment count');
-        
+        amount = Number(amount) + Number(remainder);        
         
       }
-      console.log(amount, 'amount after set remining fee also');
       checkpoints.push({
         title: `Installment ${i}`,
         amount,
@@ -82,9 +70,7 @@ export const generateCheckpoints = (
         dueDate: Timestamp.fromDate(
           new Date(jsStartDate.getTime() + (order - 1) * 30 * 24 * 60 * 60 * 1000),
         ),
-      });
-      console.log(checkpoints, 'last checkpoiotn');
-      
+      });      
     }
   }
 

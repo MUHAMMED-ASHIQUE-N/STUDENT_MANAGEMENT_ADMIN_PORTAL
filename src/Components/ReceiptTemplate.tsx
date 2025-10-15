@@ -4,12 +4,7 @@ import { format } from "date-fns";
 import signature from '../assets/signature.jpg'
 
 const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
-
   const courseName = (student?.courseId === course?.id) ? course?.title : "undkon"
-  console.log(courseName);
-  console.log(course?.title);
-
-
   return (
     <div
       id="receipt"
@@ -162,7 +157,7 @@ const ReceiptTemplate: React.FC<any> = ({ student, payment, course }) => {
             <img
               src={signature}
               alt="Signature"
-              style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
+              style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain', margin:'8px 0px 4px 0px' }}
               className="absolute"
             />
           <div

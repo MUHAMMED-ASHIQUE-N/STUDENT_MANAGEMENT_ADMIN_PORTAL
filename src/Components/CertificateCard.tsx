@@ -12,7 +12,7 @@ function CertificateCard({ cert, onGenerate }: any) {
             <div className="bg-white/20  p-2 rounded-lg">
               <Award size={24} />
             </div>
-            <h3 className="text-lg font-bold">{cert.student.name}</h3>
+            <h3 className="text-lg font-bold">{cert.student?.name}</h3>
           </div>
           <p className="text-blue-100">{cert.courseName}</p>
         </div>

@@ -114,7 +114,6 @@ export const createStudent = async (
       }
     }
 
-    console.log("Student created and course count updated successfully!");
   } catch (e) {
     console.error("Transaction failed: ", e);
     throw e;

@@ -46,8 +46,8 @@ export const generateAndUploadReceipt = async (
     const formData = new FormData();
     formData.append("file", pdfFile);
     formData.append("upload_preset", UPLOAD_PRESET);
-    formData.append("resource_type", "raw"); // CRITICAL: Use 'raw' for PDFs
-    formData.append("folder", "receipts"); // Optional: organize in folder
+    formData.append("resource_type", "raw");
+    formData.append("folder", "receipts"); 
 
     const res = await axios.post(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, 

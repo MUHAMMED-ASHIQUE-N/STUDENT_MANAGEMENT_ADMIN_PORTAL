@@ -357,9 +357,9 @@ function PaymentDetails() {
                                 <div
                                     className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                                     <p className="text-slate-700 mb-2">
-                                        <span className="font-semibold">Next Payment Due:</span> First Installment
+                                        <span className="font-semibold">Next Payment Due:</span> {nextDue.title}
                                     </p>
-                                    <p className="text-2xl font-bold text-blue-600">₹10,000</p>
+                                    <p className="text-2xl font-bold text-blue-600">₹{nextDue.amount} </p>
                                 </div>
                                 <div className="flex gap-4">
                                     <button
