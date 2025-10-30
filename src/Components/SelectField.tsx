@@ -1,5 +1,4 @@
 import { AlertCircle, BookOpen } from 'lucide-react'
-import React from 'react'
 
 function SelectField({ label, value, onChange, options, error }: any) {
   return (

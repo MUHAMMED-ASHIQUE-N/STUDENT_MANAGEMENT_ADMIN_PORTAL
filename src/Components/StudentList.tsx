@@ -1,4 +1,3 @@
-import React from 'react';
 import type { StudentDetails, Coursetype } from '../type/auth';
 import { deleteStudent } from '../utils/studentUtils';
 import { format } from 'date-fns';

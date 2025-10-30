@@ -1,4 +1,3 @@
-import React from 'react';
 import { Plus } from 'lucide-react';
 import { useDash } from '../context/DashContext';
 import { useNavigate } from 'react-router-dom';
